@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, CreditCard, Lock } from "lucide-react";
+import { Loader2, CreditCard, Lock, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface CheckoutDialogProps {
@@ -259,7 +259,3 @@ export function CheckoutDialog({ open, onOpenChange, productName, price, product
     </Dialog>
   );
 }
-
-import { Check } from "lucide-react";
-
-export { CheckoutDialog };
