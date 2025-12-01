@@ -44,9 +44,67 @@ const revokeAccessCommand = new SlashCommandBuilder()
   )
   .setDefaultMemberPermissions(0);
 
+const connectCommand = new SlashCommandBuilder()
+  .setName("connect")
+  .setDescription("Połącz swój email z Discordem aby otrzymać dostęp do MambaReceipts")
+  .addStringOption((option) =>
+    option
+      .setName("email")
+      .setDescription("Twój email z zakupem MambaReceipts")
+      .setRequired(true)
+  );
+
 export async function registerDiscordCommands(client: Client) {
   client.on(Events.InteractionCreate, async (interaction) => {
     if (!interaction.isChatInputCommand()) return;
+
+    if (interaction.commandName === "connect") {
+      const email = interaction.options.getString("email");
+      const userId = interaction.user.id;
+      const guildId = interaction.guildId;
+
+      try {
+        const { storage } = await import("./storage");
+        const discordAccess = await storage.getDiscordAccess(email.toLowerCase());
+
+        if (!discordAccess) {
+          await interaction.reply({
+            content: `❌ Email \`${email}\` nie ma dostępu do MambaReceipts!`,
+            ephemeral: true,
+          });
+          return;
+        }
+
+        if (new Date() > discordAccess.expiresAt) {
+          await interaction.reply({
+            content: `⏰ Twój dostęp wygasł ${discordAccess.expiresAt.toLocaleDateString("pl-PL")}`,
+            ephemeral: true,
+          });
+          return;
+        }
+
+        await storage.updateDiscordUserId(email.toLowerCase(), userId);
+
+        const roleId = process.env.DISCORD_ROLE_ID;
+        if (roleId && guildId) {
+          const guild = await interaction.client.guilds.fetch(guildId);
+          const member = await guild.members.fetch(userId);
+          await member.roles.add(roleId);
+        }
+
+        const expiryDate = discordAccess.expiresAt.toLocaleDateString("pl-PL");
+        await interaction.reply({
+          content: `✅ Połączono! Twój dostęp wygasa: **${expiryDate}**`,
+          ephemeral: true,
+        });
+      } catch (error: any) {
+        console.error("[Discord] Error in /connect command:", error);
+        await interaction.reply({
+          content: "❌ Błąd podczas łączenia. Spróbuj ponownie!",
+          ephemeral: true,
+        });
+      }
+    }
 
     if (interaction.commandName === "grantaccess") {
       const email = interaction.options.getString("email");
@@ -204,13 +262,13 @@ export async function registerSlashCommands(
 
     console.log("Registering slash commands...");
 
-    const commands = [grantAccessCommand.toJSON(), revokeAccessCommand.toJSON()];
+    const commands = [grantAccessCommand.toJSON(), revokeAccessCommand.toJSON(), connectCommand.toJSON()];
 
     await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
       body: commands,
     });
 
-    console.log("Successfully registered slash commands: /grantaccess, /odbierz");
+    console.log("Successfully registered slash commands: /grantaccess, /odbierz, /connect");
   } catch (error) {
     console.error("Error registering slash commands:", error);
   }
