@@ -21,7 +21,6 @@ export default function Home() {
 
   const handleSuccess = () => {
     if (selectedProduct) {
-      // Save mock purchase
       const purchases = JSON.parse(localStorage.getItem("mamba_purchases") || "[]");
       if (!purchases.includes(selectedProduct.id)) {
         purchases.push(selectedProduct.id);
@@ -75,35 +74,68 @@ export default function Home() {
             <div className="h-1 w-20 bg-primary mx-auto rounded-full shadow-[0_0_10px_hsl(142_70%_50%)]" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
             <ProductCard 
               title="MambaObywatel"
-              price="$19.99"
-              description="Complete automation for citizen identity management. Generate valid data formats instantly."
+              price="20 zł"
+              description="App version for citizen identity management. Generate valid data formats instantly."
               image={obywatelBg}
               features={[
                 "Instant Data Generation",
                 "Automated Form Filling",
                 "Secure Encryption",
-                "24/7 Discord Support"
+                "Discord Support"
               ]}
               accentColor="primary"
-              onBuy={() => handleBuy({ name: "MambaObywatel", price: "$19.99", id: "obywatel" })}
+              onBuy={() => handleBuy({ name: "MambaObywatel (App)", price: "20 zł", id: "obywatel-app" })}
+            />
+
+            <ProductCard 
+              title="MambaObywatel"
+              price="200 zł"
+              description="Full generator suite with advanced features. Complete automation toolkit."
+              image={obywatelBg}
+              features={[
+                "Full Generator Access",
+                "Advanced Customization",
+                "Batch Processing",
+                "Priority Support",
+                "Lifetime Updates"
+              ]}
+              accentColor="primary"
+              onBuy={() => handleBuy({ name: "MambaObywatel PRO", price: "200 zł", id: "obywatel-pro" })}
             />
 
             <ProductCard 
               title="MambaReceipts"
-              price="$14.99 / mo"
-              description="Professional receipt generation tool. Perfect for expense tracking and validation."
+              price="20 zł"
+              description="Professional receipt generation. Monthly subscription plan."
               image={receiptsBg}
               features={[
                 "Custom Merchant Data",
                 "Valid Checksums",
                 "Multiple Templates",
-                "Discord Bot Integration"
+                "Discord Bot Integration",
+                "Cancel Anytime"
               ]}
               accentColor="secondary"
-              onBuy={() => handleBuy({ name: "MambaReceipts", price: "$14.99 / mo", id: "receipts" })}
+              onBuy={() => handleBuy({ name: "MambaReceipts (Monthly)", price: "20 zł/miesiąc", id: "receipts-month" })}
+            />
+
+            <ProductCard 
+              title="MambaReceipts"
+              price="50 zł"
+              description="Annual subscription plan. Best value for regular users."
+              image={receiptsBg}
+              features={[
+                "Custom Merchant Data",
+                "Valid Checksums",
+                "Multiple Templates",
+                "Discord Bot Integration",
+                "Save 58% vs Monthly"
+              ]}
+              accentColor="secondary"
+              onBuy={() => handleBuy({ name: "MambaReceipts (Annual)", price: "50 zł/rok", id: "receipts-year" })}
             />
           </div>
         </div>
