@@ -35,7 +35,7 @@ export default function Home() {
       accentColor: "primary" as const,
       name: "MambaObywatel (App)",
       discordLink: "https://discord.gg/Ka5TQuWN6s",
-      stripeLink: "https://buy.stripe.com/28E4gA0l499Dg25eNygEg00"
+      stripeLink: "https://buy.stripe.com/test_6oU28r2O8f6v3eI0C9cEw00"
     },
     {
       id: "obywatel-pro" as ProductId,
@@ -46,7 +46,7 @@ export default function Home() {
       accentColor: "primary" as const,
       name: "MambaObywatel PRO",
       discordLink: "https://discord.gg/Ka5TQuWN6s",
-      stripeLink: "https://buy.stripe.com/6oU28s5Fo3PjaHLfRCgEg06"
+      stripeLink: "https://buy.stripe.com/test_6oU28r2O8f6v3eI0C9cEw00"
     },
     {
       id: "receipts-month" as ProductId,
@@ -58,7 +58,7 @@ export default function Home() {
       accentColor: "secondary" as const,
       name: "MambaReceipts (Monthly)",
       discordLink: "https://discord.gg/HxGrw2Rf99",
-      stripeLink: "https://buy.stripe.com/9B600k7NwbhLdTXdJugEg02",
+      stripeLink: "https://buy.stripe.com/test_6oU28r2O8f6v3eI0C9cEw00",
       requiresDiscordBeforePurchase: true
     },
     {
@@ -71,7 +71,7 @@ export default function Home() {
       accentColor: "secondary" as const,
       name: "MambaReceipts (Annual)",
       discordLink: "https://discord.gg/HxGrw2Rf99",
-      stripeLink: "https://buy.stripe.com/5kQ00k8RA5Xr2bfdJugEg03",
+      stripeLink: "https://buy.stripe.com/test_6oU28r2O8f6v3eI0C9cEw00",
       requiresDiscordBeforePurchase: true
     }
   ];
