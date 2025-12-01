@@ -46,3 +46,10 @@ waitForPort = 5000
 [agent]
 mockupState = "FULLSTACK"
 integrations = ["discord:1.0.0"]
+
+[userenv]
+
+[userenv.shared]
+DISCORD_GUILD_ID = "YOUR_GUILD_ID_HERE"
+DISCORD_RECEIPTS_ROLE_ID = "YOUR_RECEIPTS_ROLE_ID_HERE"
+API_BASE_URL = "http://localhost:5000"

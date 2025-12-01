@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
+import { startDiscordBot } from "./discord-bot";
 
 const app = express();
 const httpServer = createServer(app);
@@ -61,6 +62,13 @@ app.use((req, res, next) => {
 
 (async () => {
   await registerRoutes(httpServer, app);
+
+  // Start Discord bot if configured
+  try {
+    await startDiscordBot();
+  } catch (error) {
+    console.warn("Discord bot failed to start (optional):", error);
+  }
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;

@@ -1,4 +1,5 @@
-import { Client, GatewayIntentBits } from "discord.js";
+import { Client, GatewayIntentBits, Events } from "discord.js";
+import { registerDiscordCommands, registerSlashCommands } from "./discord-commands";
 
 let connectionSettings: any;
 let cachedClient: Client | null = null;
@@ -67,6 +68,7 @@ export async function getDiscordClient() {
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.DirectMessages,
       ],
     });
 
@@ -74,6 +76,46 @@ export async function getDiscordClient() {
     return client;
   } catch (error) {
     console.error("Error creating Discord client:", error);
+    return null;
+  }
+}
+
+export async function startDiscordBot() {
+  try {
+    const token = await getAccessToken();
+    if (!token) {
+      console.error("No Discord token available for bot start");
+      return null;
+    }
+
+    const client = new Client({
+      intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.DirectMessages,
+      ],
+    });
+
+    client.on(Events.ClientReady, async () => {
+      console.log(`✅ Discord bot logged in as ${client.user?.tag}`);
+
+      // Register slash commands
+      const guildId = process.env.DISCORD_GUILD_ID;
+      const clientId = client.user?.id;
+
+      if (guildId && clientId) {
+        await registerSlashCommands(token, clientId, guildId);
+      }
+    });
+
+    // Register command handlers
+    registerDiscordCommands(client);
+
+    await client.login(token);
+    return client;
+  } catch (error) {
+    console.error("Error starting Discord bot:", error);
     return null;
   }
 }
