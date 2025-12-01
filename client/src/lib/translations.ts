@@ -50,14 +50,14 @@ export const translations = {
       },
       receiptsYear: {
         title: "MambaReceipts",
-        price: "50 zł",
+        price: "60 zł",
         description: "Roczny plan subskrypcji. Najlepsza wartość dla zwykłych użytkowników.",
         features: [
           "Niestandardowe dane handlowca",
           "Prawidłowe sumy kontrolne",
           "Wiele szablonów",
           "Integracja bota Discord",
-          "Oszczędź 58% w porównaniu z miesięcznym"
+          "Oszczędź 50% w porównaniu z miesięcznym"
         ]
       },
       buyButton: "KUP DOSTĘP"

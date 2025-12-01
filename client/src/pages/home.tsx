@@ -71,6 +71,7 @@ export default function Home() {
       accentColor: "secondary" as const,
       name: "MambaReceipts (Annual)",
       discordLink: "https://discord.gg/HxGrw2Rf99",
+      stripeLink: "https://buy.stripe.com/5kQ00k8RA5Xr2bfdJugEg03",
       requiresDiscordBeforePurchase: true
     }
   ];
