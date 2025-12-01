@@ -105,13 +105,7 @@ export async function registerDiscordCommands(client: Client) {
           expiresAt: expiresAt,
         });
 
-        // Add role
-        const roleId = process.env.DISCORD_ROLE_ID;
-        if (roleId && interaction.guildId) {
-          const guild = await interaction.client.guilds.fetch(interaction.guildId);
-          const member = await guild.members.fetch(userId);
-          await member.roles.add(roleId);
-        }
+        console.log(`[Discord] Granted access to ${userId} for ${days} days until ${expiresAt}`);
 
         const expiryDate = expiresAt.toLocaleDateString("pl-PL");
         
