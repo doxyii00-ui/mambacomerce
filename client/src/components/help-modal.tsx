@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { HelpCircle, ExternalLink } from "lucide-react";
+import { HelpCircle } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
 import { translations } from "@/lib/translations";
 
@@ -23,35 +23,21 @@ export function HelpModal({ open, onOpenChange }: HelpModalProps) {
               {t.help.title}
             </DialogTitle>
           </div>
-          <DialogDescription className="text-zinc-300 text-base mt-4">
-            {t.help.description}
-          </DialogDescription>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-          <a
-            href="https://discord.gg/Ka5TQuWN6s"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group"
-          >
-            <Button className="w-full bg-primary text-black hover:bg-primary/90 font-bold h-12 flex items-center justify-center gap-2">
-              <ExternalLink className="h-4 w-4" />
-              {t.help.joinDiscord}
+        <div className="mt-6 space-y-6">
+          <p className="text-zinc-300 text-base leading-relaxed">
+            {t.help.description}
+          </p>
+          
+          <div className="pt-4">
+            <Button 
+              onClick={() => onOpenChange(false)}
+              className="w-full bg-primary text-black hover:bg-primary/90 font-bold"
+            >
+              OK
             </Button>
-          </a>
-
-          <a
-            href="https://discord.gg/HxGrw2Rf99"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group"
-          >
-            <Button className="w-full bg-secondary text-white hover:bg-secondary/90 font-bold h-12 flex items-center justify-center gap-2">
-              <ExternalLink className="h-4 w-4" />
-              {t.help.createTicket}
-            </Button>
-          </a>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
