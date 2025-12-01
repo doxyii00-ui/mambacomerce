@@ -44,6 +44,25 @@ const revokeAccessCommand = new SlashCommandBuilder()
   )
   .setDefaultMemberPermissions(0);
 
+const nadajDostepCommand = new SlashCommandBuilder()
+  .setName("nadajdostep")
+  .setDescription("[ADMIN] Przydziel dostęp do MambaReceipts użytkownikowi")
+  .addUserOption((option) =>
+    option
+      .setName("user")
+      .setDescription("Discord user do przydzielenia dostępu")
+      .setRequired(true)
+  )
+  .addIntegerOption((option) =>
+    option
+      .setName("dni")
+      .setDescription("Ilość dni dostępu")
+      .setRequired(true)
+      .setMinValue(1)
+      .setMaxValue(999)
+  )
+  .setDefaultMemberPermissions(0);
+
 const polaczCommand = new SlashCommandBuilder()
   .setName("polacz")
   .setDescription("Połącz swój email z Discordem aby otrzymać dostęp do MambaReceipts")
@@ -57,6 +76,56 @@ const polaczCommand = new SlashCommandBuilder()
 export async function registerDiscordCommands(client: Client) {
   client.on(Events.InteractionCreate, async (interaction) => {
     if (!interaction.isChatInputCommand()) return;
+
+    if (interaction.commandName === "nadajdostep") {
+      const user = interaction.options.getUser("user");
+      const days = interaction.options.getInteger("dni") ?? 31;
+      const userId = user?.id;
+
+      if (!userId || !user) {
+        await interaction.reply({
+          content: `❌ Błąd: nie mogę znaleźć użytkownika!`,
+          ephemeral: true,
+        });
+        return;
+      }
+
+      try {
+        const { storage } = await import("./storage");
+        
+        // Create Discord access entry
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + days);
+
+        const email = `admin-${userId}@mamba.local`;
+        
+        await storage.grantDiscordAccess({
+          email: email,
+          discordUserId: userId,
+          expiresAt: expiresAt,
+        });
+
+        // Add role
+        const roleId = process.env.DISCORD_ROLE_ID;
+        if (roleId && interaction.guildId) {
+          const guild = await interaction.client.guilds.fetch(interaction.guildId);
+          const member = await guild.members.fetch(userId);
+          await member.roles.add(roleId);
+        }
+
+        const expiryDate = expiresAt.toLocaleDateString("pl-PL");
+        await interaction.reply({
+          content: `✅ Przydzielono dostęp użytkownikowi ${user.tag}!\n📅 Wygasa: **${expiryDate}**`,
+          ephemeral: true,
+        });
+      } catch (error: any) {
+        console.error("[Discord] Error in /nadajdostep command:", error);
+        await interaction.reply({
+          content: "❌ Błąd podczas przydzielania dostępu!",
+          ephemeral: true,
+        });
+      }
+    }
 
     if (interaction.commandName === "polacz") {
       const email = interaction.options.getString("email") ?? "";
@@ -271,13 +340,13 @@ export async function registerSlashCommands(
 
     console.log("Registering slash commands...");
 
-    const commands = [grantAccessCommand.toJSON(), revokeAccessCommand.toJSON(), polaczCommand.toJSON()];
+    const commands = [grantAccessCommand.toJSON(), revokeAccessCommand.toJSON(), nadajDostepCommand.toJSON(), polaczCommand.toJSON()];
 
     await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
       body: commands,
     });
 
-    console.log("Successfully registered slash commands: /grantaccess, /odbierz, /polacz");
+    console.log("Successfully registered slash commands: /grantaccess, /odbierz, /nadajdostep, /polacz");
   } catch (error) {
     console.error("Error registering slash commands:", error);
   }
