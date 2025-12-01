@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Order, type InsertOrder, type DiscordAccess, type InsertDiscordAccess, type ObywatelForm, type InsertObywatelForm } from "@shared/schema";
+import { type User, type InsertUser, type Order, type InsertOrder, type DiscordAccess, type InsertDiscordAccess, type ObywatelForm, type InsertObywatelForm, type AccessCode, type InsertAccessCode } from "@shared/schema";
 import { randomUUID } from "crypto";
 import bcrypt from "bcryptjs";
 
@@ -23,6 +23,9 @@ export interface IStorage {
   getObywatelForm(orderId: string): Promise<ObywatelForm | undefined>;
   updateObywatelForm(orderId: string, data: Partial<ObywatelForm>): Promise<ObywatelForm | undefined>;
   getObywatelFormByEmail(email: string): Promise<ObywatelForm[]>;
+  createAccessCode(code: InsertAccessCode): Promise<AccessCode>;
+  getUnusedAccessCode(productType: string): Promise<AccessCode | undefined>;
+  markCodeAsUsed(code: string, email: string): Promise<AccessCode | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -30,6 +33,7 @@ export class MemStorage implements IStorage {
   private orders: Map<string, Order>;
   private discordAccesses: Map<string, DiscordAccess>;
   private obywatelForms: Map<string, ObywatelForm>;
+  private accessCodes: Map<string, AccessCode>;
   private orderCounter: number;
 
   constructor() {
@@ -37,6 +41,7 @@ export class MemStorage implements IStorage {
     this.orders = new Map();
     this.discordAccesses = new Map();
     this.obywatelForms = new Map();
+    this.accessCodes = new Map();
     this.orderCounter = 0;
   }
 
@@ -205,6 +210,42 @@ export class MemStorage implements IStorage {
     return Array.from(this.obywatelForms.values()).filter(
       (form) => form.email === email
     );
+  }
+
+  async createAccessCode(code: InsertAccessCode): Promise<AccessCode> {
+    const id = randomUUID();
+    const accessCode: AccessCode = {
+      id,
+      code: code.code,
+      productType: code.productType,
+      email: code.email || null,
+      orderId: code.orderId || null,
+      isUsed: "false",
+      usedAt: null,
+      createdAt: new Date(),
+    };
+    this.accessCodes.set(code.code, accessCode);
+    return accessCode;
+  }
+
+  async getUnusedAccessCode(productType: string): Promise<AccessCode | undefined> {
+    return Array.from(this.accessCodes.values()).find(
+      (code) => code.productType === productType && code.isUsed === "false"
+    );
+  }
+
+  async markCodeAsUsed(code: string, email: string): Promise<AccessCode | undefined> {
+    const accessCode = this.accessCodes.get(code);
+    if (!accessCode) return undefined;
+    
+    const updated: AccessCode = {
+      ...accessCode,
+      email,
+      isUsed: "true",
+      usedAt: new Date(),
+    };
+    this.accessCodes.set(code, updated);
+    return updated;
   }
 }
 
