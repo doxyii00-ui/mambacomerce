@@ -43,8 +43,12 @@ export class MemStorage implements IStorage {
   async createOrder(insertOrder: InsertOrder): Promise<Order> {
     const id = randomUUID();
     const order: Order = {
-      ...insertOrder,
       id,
+      email: insertOrder.email,
+      productId: insertOrder.productId,
+      productName: insertOrder.productName,
+      price: insertOrder.price,
+      stripeSessionId: insertOrder.stripeSessionId ?? null,
       status: "pending",
       createdAt: new Date(),
     };

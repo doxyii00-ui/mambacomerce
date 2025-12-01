@@ -29,6 +29,9 @@ export const insertOrderSchema = createInsertSchema(orders).omit({
   id: true,
   createdAt: true,
   status: true,
+}).extend({
+  email: z.string().email("Invalid email address"),
+  productId: z.string().min(1, "Product ID required"),
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;

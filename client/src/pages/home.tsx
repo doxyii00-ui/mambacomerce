@@ -207,7 +207,6 @@ export default function Home() {
                   price={selectedProductData.price}
                   description={selectedProductData.description}
                   video={selectedProductData.video}
-                  image={selectedProductData.image}
                   features={selectedProductData.features}
                   accentColor={selectedProductData.accentColor}
                   discordLink={selectedProductData.discordLink}

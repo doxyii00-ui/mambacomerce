@@ -146,7 +146,7 @@ function MambaObywatelForm({ t }: { t: typeof translations.pl }) {
               <Input type="date" className="bg-black/40 border-white/10" />
             </div>
             <div className="space-y-2">
-              <Label>{t.dashboard.obywatelForm.peselnumber}</Label>
+              <Label>{t.dashboard.obywatelForm.peselNumber}</Label>
               <Input className="bg-black/40 border-white/10" placeholder="00000000000" />
             </div>
             <div className="space-y-2">

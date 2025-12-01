@@ -33,30 +33,45 @@ export function CheckoutDialog({ open, onOpenChange, productName, price, product
 
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (!email || !productId) return;
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      console.error("Invalid email format");
+      return;
+    }
     
     setIsLoading(true);
     
     try {
-      // Create order in database
+      // Create order in database with sanitized data
       const response = await fetch("/api/orders", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "X-Requested-With": "XMLHttpRequest"
+        },
         body: JSON.stringify({
-          email,
-          productId,
-          productName,
-          price,
+          email: email.trim().toLowerCase(),
+          productId: productId.trim(),
+          productName: productName.trim(),
+          price: price.trim(),
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to create order");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to create order");
+      }
 
       const order = await response.json();
 
       // Store order ID and email in localStorage for later verification
-      localStorage.setItem("mamba_order_id", order.id);
-      localStorage.setItem("mamba_order_email", email);
+      if (order.id && typeof order.id === "string") {
+        localStorage.setItem("mamba_order_id", order.id);
+        localStorage.setItem("mamba_order_email", email.toLowerCase());
+      }
       
       setIsLoading(false);
       setStep("success");
