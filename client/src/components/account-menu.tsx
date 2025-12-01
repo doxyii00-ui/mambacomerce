@@ -40,7 +40,7 @@ export function AccountMenu() {
     localStorage.removeItem("mamba_user_email");
     localStorage.removeItem("mamba_user_id");
     setPopoverOpen(false);
-    setLocation("/");
+    window.location.reload();
   };
 
   const handleChangePassword = async () => {
@@ -115,7 +115,7 @@ export function AccountMenu() {
       toast({ title: "Sukces", description: t.account.deleteAccount.success, duration: 2000 });
       localStorage.removeItem("mamba_user_email");
       localStorage.removeItem("mamba_user_id");
-      setTimeout(() => setLocation("/"), 1000);
+      setTimeout(() => window.location.reload(), 1000);
     } catch (error) {
       toast({ title: "Błąd", description: "Coś poszło nie tak", duration: 3000 });
     } finally {
