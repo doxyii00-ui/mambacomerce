@@ -1,17 +1,17 @@
 import type { Express, Request } from "express";
-import Stripe from "stripe";
 import { storage } from "./storage";
 import { sendAccessCodeEmail, sendReceiptsEmail, sendTicketEmail } from "./email-service";
 import { grantDiscordRole } from "./discord-bot";
 
-let stripe: Stripe | null = null;
+let stripe: any = null;
 
-function getStripe(): Stripe {
+async function getStripe() {
   if (!stripe) {
     const apiKey = process.env.STRIPE_SECRET_KEY;
     if (!apiKey) {
       throw new Error("STRIPE_SECRET_KEY not configured");
     }
+    const Stripe = (await import("stripe")).default;
     stripe = new Stripe(apiKey, {
       apiVersion: "2024-11-20",
     });
@@ -51,7 +51,8 @@ export async function setupStripeWebhook(app: Express): Promise<void> {
       let event;
       try {
         const body = req.rawBody as Buffer;
-        event = getStripe().webhooks.constructEvent(body, sig, webhookSecret);
+        const stripeClient = await getStripe();
+        event = stripeClient.webhooks.constructEvent(body, sig, webhookSecret);
         console.log("[Stripe] Event verified, type:", event.type);
       } catch (error) {
         console.error("[Stripe] Signature verification failed:", error);
