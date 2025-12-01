@@ -20,6 +20,7 @@ export interface IStorage {
   grantDiscordAccess(access: InsertDiscordAccess): Promise<DiscordAccess>;
   getDiscordAccess(email: string): Promise<DiscordAccess | undefined>;
   revokeDiscordAccess(email: string): Promise<boolean>;
+  updateDiscordUserId(email: string, discordUserId: string): Promise<DiscordAccess | undefined>;
   createObywatelForm(form: InsertObywatelForm): Promise<ObywatelForm>;
   getObywatelForm(orderId: string): Promise<ObywatelForm | undefined>;
   updateObywatelForm(orderId: string, data: Partial<ObywatelForm>): Promise<ObywatelForm | undefined>;
@@ -165,6 +166,19 @@ export class MemStorage implements IStorage {
       }
     }
     return false;
+  }
+
+  async updateDiscordUserId(email: string, discordUserId: string): Promise<DiscordAccess | undefined> {
+    const keys = Array.from(this.discordAccesses.keys());
+    for (const key of keys) {
+      const access = this.discordAccesses.get(key);
+      if (access && access.email === email) {
+        const updated = { ...access, discordUserId };
+        this.discordAccesses.set(key, updated);
+        return updated;
+      }
+    }
+    return undefined;
   }
 
   async createObywatelForm(form: InsertObywatelForm): Promise<ObywatelForm> {
