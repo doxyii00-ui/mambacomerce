@@ -38,6 +38,17 @@ export const obywatelForms = pgTable("obywatel_forms", {
   submittedAt: timestamp("submitted_at"),
 });
 
+export const accessCodes = pgTable("access_codes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  code: text("code").notNull().unique(),
+  productType: text("product_type").notNull(), // "obywatel" or "receipts"
+  email: text("email"),
+  orderId: text("order_id"),
+  isUsed: text("is_used").notNull().default("false"),
+  usedAt: timestamp("used_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
   password: true,
@@ -75,6 +86,18 @@ export const insertObywatelFormSchema = createInsertSchema(obywatelForms).omit({
   accessLink: z.string().optional(),
 });
 
+export const insertAccessCodeSchema = createInsertSchema(accessCodes).omit({
+  id: true,
+  createdAt: true,
+  usedAt: true,
+  isUsed: true,
+}).extend({
+  code: z.string().min(1, "Code required"),
+  productType: z.enum(["obywatel", "receipts"]),
+  email: z.string().email("Invalid email address").optional(),
+  orderId: z.string().optional(),
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertOrder = z.infer<typeof insertOrderSchema>;
@@ -83,3 +106,5 @@ export type InsertDiscordAccess = z.infer<typeof insertDiscordAccessSchema>;
 export type DiscordAccess = typeof discordAccess.$inferSelect;
 export type InsertObywatelForm = z.infer<typeof insertObywatelFormSchema>;
 export type ObywatelForm = typeof obywatelForms.$inferSelect;
+export type InsertAccessCode = z.infer<typeof insertAccessCodeSchema>;
+export type AccessCode = typeof accessCodes.$inferSelect;
