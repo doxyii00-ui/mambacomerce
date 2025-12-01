@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Check, ArrowRight } from "lucide-react";
+import { Check, ArrowRight, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
@@ -12,6 +12,7 @@ interface ProductCardProps {
   features: string[];
   accentColor?: "primary" | "secondary";
   onBuy: () => void;
+  discordLink?: string;
 }
 
 export function ProductCard({ 
@@ -22,7 +23,8 @@ export function ProductCard({
   video,
   features, 
   accentColor = "primary",
-  onBuy 
+  onBuy,
+  discordLink
 }: ProductCardProps) {
   const colorClass = accentColor === "primary" ? "text-primary" : "text-secondary";
   const borderClass = accentColor === "primary" ? "border-primary/20 group-hover:border-primary/50" : "border-secondary/20 group-hover:border-secondary/50";
@@ -89,6 +91,24 @@ export function ProductCard({
                   />
                 )}
               </div>
+            </div>
+          )}
+
+          {discordLink && (
+            <div className="bg-gradient-to-r from-[#5865F2]/10 to-[#5865F2]/5 border border-[#5865F2]/30 rounded-lg p-4">
+              <h3 className="text-sm font-display font-bold text-white mb-2 flex items-center gap-2 uppercase tracking-wider">
+                <MessageCircle className="h-4 w-4 text-[#5865F2]" />
+                Społeczność Discord
+              </h3>
+              <p className="text-xs text-gray-400 mb-3">Dołącz do naszej społeczności, aby uzyskać wsparcie i dzielić się doświadczeniami z innymi użytkownikami.</p>
+              <a 
+                href={discordLink} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-[#5865F2] hover:text-white transition-colors text-sm font-mono font-bold"
+              >
+                Dołącz do Discorda <ArrowRight className="h-3 w-3" />
+              </a>
             </div>
           )}
         </CardContent>

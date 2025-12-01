@@ -33,7 +33,8 @@ export default function Home() {
       description: t.products.obywatelApp.description,
       features: t.products.obywatelApp.features,
       accentColor: "primary" as const,
-      name: "MambaObywatel (App)"
+      name: "MambaObywatel (App)",
+      discordLink: "https://discord.gg/obywatel"
     },
     {
       id: "obywatel-pro" as ProductId,
@@ -42,7 +43,8 @@ export default function Home() {
       description: t.products.obywatelPro.description,
       features: t.products.obywatelPro.features,
       accentColor: "primary" as const,
-      name: "MambaObywatel PRO"
+      name: "MambaObywatel PRO",
+      discordLink: "https://discord.gg/obywatel"
     },
     {
       id: "receipts-month" as ProductId,
@@ -52,7 +54,8 @@ export default function Home() {
       video: receiptsVideo,
       features: t.products.receiptsMonth.features,
       accentColor: "secondary" as const,
-      name: "MambaReceipts (Monthly)"
+      name: "MambaReceipts (Monthly)",
+      discordLink: "https://discord.gg/receipts"
     },
     {
       id: "receipts-year" as ProductId,
@@ -62,7 +65,8 @@ export default function Home() {
       video: receiptsVideo,
       features: t.products.receiptsYear.features,
       accentColor: "secondary" as const,
-      name: "MambaReceipts (Annual)"
+      name: "MambaReceipts (Annual)",
+      discordLink: "https://discord.gg/receipts"
     }
   ];
 
@@ -193,6 +197,7 @@ export default function Home() {
                   image={selectedProductData.image}
                   features={selectedProductData.features}
                   accentColor={selectedProductData.accentColor}
+                  discordLink={selectedProductData.discordLink}
                   onBuy={() => handleBuy({
                     name: selectedProductData.name,
                     price: selectedProductData.price,
