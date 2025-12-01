@@ -9,6 +9,8 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   verifyPassword(email: string, password: string): Promise<boolean>;
+  deleteUser(email: string): Promise<boolean>;
+  changePassword(email: string, newPassword: string): Promise<boolean>;
   createOrder(order: InsertOrder): Promise<Order>;
   getOrder(id: string): Promise<Order | undefined>;
   getOrderByEmail(email: string): Promise<Order[]>;
