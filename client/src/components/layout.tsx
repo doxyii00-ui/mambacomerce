@@ -1,23 +1,28 @@
 import { Link } from "wouter";
-import { ShieldCheck, ReceiptText, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
+import { LanguageSwitcher } from "@/components/language-switcher";
+import { useLanguage } from "@/hooks/use-language";
+import { translations } from "@/lib/translations";
 import logo from "@assets/generated_images/futuristic_glowing_green_mamba_snake_logo.png";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
+  const { language } = useLanguage();
+  const t = translations[language];
 
   const NavContent = () => (
     <>
       <Link href="/" className="text-foreground/80 hover:text-primary transition-colors font-display tracking-wider cursor-pointer">
-        HOME
+        {t.nav.home}
       </Link>
       <Link href="/dashboard" className="text-foreground/80 hover:text-primary transition-colors font-display tracking-wider cursor-pointer">
-        DASHBOARD
+        {t.nav.dashboard}
       </Link>
       <a href="https://discord.gg/mamba" target="_blank" className="text-foreground/80 hover:text-secondary transition-colors font-display tracking-wider cursor-pointer">
-        DISCORD
+        {t.nav.discord}
       </a>
     </>
   );
@@ -41,27 +46,31 @@ export function Layout({ children }: { children: React.ReactNode }) {
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8">
             <NavContent />
+            <LanguageSwitcher />
             <Button 
               variant="outline" 
               className="border-primary/50 text-primary hover:bg-primary hover:text-black font-mono text-xs uppercase tracking-widest"
             >
-              Login
+              {t.nav.login}
             </Button>
           </nav>
 
           {/* Mobile Nav */}
-          <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="bg-card/95 backdrop-blur-xl border-l border-white/10">
-              <div className="flex flex-col gap-6 mt-10">
-                <NavContent />
-              </div>
-            </SheetContent>
-          </Sheet>
+          <div className="flex md:hidden gap-2">
+            <LanguageSwitcher />
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="bg-card/95 backdrop-blur-xl border-l border-white/10">
+                <div className="flex flex-col gap-6 mt-10">
+                  <NavContent />
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </header>
 
@@ -75,12 +84,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2 opacity-70">
             <img src={logo} alt="Mamba" className="h-6 w-6 grayscale" />
-            <span className="font-mono text-xs text-muted-foreground">© 2024 MAMBA SERVICES</span>
+            <span className="font-mono text-xs text-muted-foreground">{t.footer.copyright}</span>
           </div>
           <div className="flex gap-6 text-xs font-mono text-muted-foreground">
-            <a href="#" className="hover:text-primary transition-colors">TERMS</a>
-            <a href="#" className="hover:text-primary transition-colors">PRIVACY</a>
-            <a href="#" className="hover:text-primary transition-colors">SUPPORT</a>
+            <a href="#" className="hover:text-primary transition-colors">{t.footer.terms}</a>
+            <a href="#" className="hover:text-primary transition-colors">{t.footer.privacy}</a>
+            <a href="#" className="hover:text-primary transition-colors">{t.footer.support}</a>
           </div>
         </div>
       </footer>

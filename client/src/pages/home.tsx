@@ -4,6 +4,8 @@ import { CheckoutDialog } from "@/components/checkout-dialog";
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
+import { useLanguage } from "@/hooks/use-language";
+import { translations } from "@/lib/translations";
 import mambaLogo from "@assets/generated_images/futuristic_glowing_green_mamba_snake_logo.png";
 import obywatelBg from "@assets/generated_images/cyberpunk_digital_id_card_abstract_background.png";
 import receiptsBg from "@assets/generated_images/cyberpunk_digital_receipt_abstract_background.png";
@@ -14,6 +16,8 @@ export default function Home() {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<{ name: string; price: string; id: string } | null>(null);
   const [_, setLocation] = useLocation();
+  const { language } = useLanguage();
+  const t = translations[language];
 
   const handleBuy = (product: { name: string; price: string; id: string }) => {
     setSelectedProduct(product);
@@ -54,12 +58,11 @@ export default function Home() {
               className="h-32 w-32 mx-auto mb-8 drop-shadow-[0_0_30px_hsl(142_70%_50%_/_0.3)] animate-pulse" 
             />
             <h1 className="text-5xl md:text-7xl font-display font-black text-white tracking-tight mb-6 leading-tight">
-              AUTOMATE YOUR <br />
-              <span className="text-primary text-glow">DIGITAL IDENTITY</span>
+              {t.hero.title} <br />
+              <span className="text-primary text-glow">{t.hero.titleHighlight}</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10 font-light">
-              Premium automated services for MambaObywatel and MambaReceipts. 
-              Instant delivery via Discord integration.
+              {t.hero.description}
             </p>
           </motion.div>
         </div>
@@ -71,72 +74,49 @@ export default function Home() {
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-4">OUR PRODUCTS</h2>
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-4">{t.products.title}</h2>
             <div className="h-1 w-20 bg-primary mx-auto rounded-full shadow-[0_0_10px_hsl(142_70%_50%)]" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
             <ProductCard 
-              title="MambaObywatel"
-              price="20 zł"
-              description="App version for citizen identity management. Generate valid data formats instantly."
+              title={t.products.obywatelApp.title}
+              price={t.products.obywatelApp.price}
+              description={t.products.obywatelApp.description}
               video={obywatelVideo}
-              features={[
-                "Instant Data Generation",
-                "Automated Form Filling",
-                "Secure Encryption",
-                "Discord Support"
-              ]}
+              features={t.products.obywatelApp.features}
               accentColor="primary"
-              onBuy={() => handleBuy({ name: "MambaObywatel (App)", price: "20 zł", id: "obywatel-app" })}
+              onBuy={() => handleBuy({ name: "MambaObywatel (App)", price: t.products.obywatelApp.price, id: "obywatel-app" })}
             />
 
             <ProductCard 
-              title="MambaObywatel"
-              price="200 zł"
-              description="Full generator suite with advanced features. Complete automation toolkit."
+              title={t.products.obywatelPro.title}
+              price={t.products.obywatelPro.price}
+              description={t.products.obywatelPro.description}
               image={obywatelBg}
-              features={[
-                "Full Generator Access",
-                "Advanced Customization",
-                "Batch Processing",
-                "Priority Support",
-                "Lifetime Updates"
-              ]}
+              features={t.products.obywatelPro.features}
               accentColor="primary"
-              onBuy={() => handleBuy({ name: "MambaObywatel PRO", price: "200 zł", id: "obywatel-pro" })}
+              onBuy={() => handleBuy({ name: "MambaObywatel PRO", price: t.products.obywatelPro.price, id: "obywatel-pro" })}
             />
 
             <ProductCard 
-              title="MambaReceipts"
-              price="20 zł"
-              description="Professional receipt generation. Monthly subscription plan."
+              title={t.products.receiptsMonth.title}
+              price={t.products.receiptsMonth.price}
+              description={t.products.receiptsMonth.description}
               image={receiptsBg}
-              features={[
-                "Custom Merchant Data",
-                "Valid Checksums",
-                "Multiple Templates",
-                "Discord Bot Integration",
-                "Cancel Anytime"
-              ]}
+              features={t.products.receiptsMonth.features}
               accentColor="secondary"
-              onBuy={() => handleBuy({ name: "MambaReceipts (Monthly)", price: "20 zł/miesiąc", id: "receipts-month" })}
+              onBuy={() => handleBuy({ name: "MambaReceipts (Monthly)", price: t.products.receiptsMonth.price, id: "receipts-month" })}
             />
 
             <ProductCard 
-              title="MambaReceipts"
-              price="50 zł"
-              description="Annual subscription plan. Best value for regular users."
+              title={t.products.receiptsYear.title}
+              price={t.products.receiptsYear.price}
+              description={t.products.receiptsYear.description}
               image={receiptsBg}
-              features={[
-                "Custom Merchant Data",
-                "Valid Checksums",
-                "Multiple Templates",
-                "Discord Bot Integration",
-                "Save 58% vs Monthly"
-              ]}
+              features={t.products.receiptsYear.features}
               accentColor="secondary"
-              onBuy={() => handleBuy({ name: "MambaReceipts (Annual)", price: "50 zł/rok", id: "receipts-year" })}
+              onBuy={() => handleBuy({ name: "MambaReceipts (Annual)", price: t.products.receiptsYear.price, id: "receipts-year" })}
             />
           </div>
         </div>
