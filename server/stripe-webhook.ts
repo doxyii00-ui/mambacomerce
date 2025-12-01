@@ -5,10 +5,13 @@ import { grantDiscordRole } from "./discord-bot";
 
 // Mapping linków Stripe do produktów
 const STRIPE_LINK_MAPPING: { [key: string]: { type: "obywatel" | "receipts"; tier?: "basic" | "premium"; duration?: number } } = {
+  // Live links
   "6oU28s5Fo3PjaHLfRCgEg06": { type: "obywatel", tier: "premium" }, // obywatel 200 - ticket
   "28E4gA0l499Dg25eNygEg00": { type: "obywatel", tier: "basic" }, // obywatel 20 - kod
   "9B600k7NwbhLdTXdJugEg02": { type: "receipts", duration: 31 }, // receipts 20 (monthly)
   "5kQ00k8RA5Xr2bfdJugEg03": { type: "receipts", duration: 999 }, // receipts 60 (annual)
+  // Test links
+  "6oU28r2O8f6v3eI0C9cEw00": { type: "obywatel", tier: "premium" }, // test: obywatel 200 - ticket
 };
 
 export async function setupStripeWebhook(app: Express): Promise<void> {
@@ -55,11 +58,15 @@ export async function setupStripeWebhook(app: Express): Promise<void> {
         // Extract link ID from payment_link (it's just an ID, not a full URL)
         const linkId = paymentLinkId?.split('/').pop() || paymentLinkId;
         
-        // Determine product type from link mapping
-        const productConfig = STRIPE_LINK_MAPPING[linkId];
+        console.log(`[Stripe] Looking up payment link ID: ${linkId}`);
         
+        // Determine product type from link mapping
+        let productConfig = STRIPE_LINK_MAPPING[linkId];
+        
+        // If not found, log all available IDs for debugging
         if (!productConfig) {
           console.warn(`[Stripe] Unknown payment link: ${linkId}`);
+          console.warn(`[Stripe] Available links:`, Object.keys(STRIPE_LINK_MAPPING));
           res.status(200).json({ received: true });
           return;
         }
