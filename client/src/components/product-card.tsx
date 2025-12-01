@@ -37,49 +37,60 @@ export function ProductCard({
       className="h-full"
     >
       <Card className={`h-full flex flex-col overflow-hidden bg-card/40 backdrop-blur-md border ${borderClass} transition-colors group`}>
-        {/* Image/Video Area */}
-        <div className="h-48 overflow-hidden relative">
-          <div className={`absolute inset-0 bg-gradient-to-t from-background to-transparent z-10`} />
-          {video ? (
-            <video 
-              src={video} 
-              autoPlay 
-              muted 
-              loop 
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-80 group-hover:opacity-100" 
-            />
-          ) : (
-            <img 
-              src={image} 
-              alt={title} 
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-80 group-hover:opacity-100" 
-            />
-          )}
-          <div className="absolute top-4 right-4 z-20 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
-            <span className={`font-mono font-bold ${colorClass}`}>{price}</span>
-          </div>
-        </div>
-
         <CardHeader>
-          <CardTitle className={`font-display text-2xl tracking-wide ${colorClass} text-glow`}>
-            {title}
-          </CardTitle>
-          <CardDescription className="text-muted-foreground h-12 line-clamp-2">
-            {description}
-          </CardDescription>
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex-1">
+              <CardTitle className={`font-display text-2xl tracking-wide ${colorClass} text-glow`}>
+                {title}
+              </CardTitle>
+              <CardDescription className="text-muted-foreground mt-2">
+                {description}
+              </CardDescription>
+            </div>
+            <div className="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 whitespace-nowrap ml-4">
+              <span className={`font-mono font-bold ${colorClass}`}>{price}</span>
+            </div>
+          </div>
         </CardHeader>
 
-        <CardContent className="flex-1">
-          <ul className="space-y-3">
-            {features.map((feature, i) => (
-              <li key={i} className="flex items-center gap-3 text-sm text-gray-300">
-                <div className={`rounded-full p-1 bg-white/5 ${colorClass}`}>
-                  <Check className="h-3 w-3" />
-                </div>
-                {feature}
-              </li>
-            ))}
-          </ul>
+        <CardContent className="flex-1 space-y-6">
+          <div>
+            <h3 className="text-sm font-display font-bold text-white mb-3 uppercase tracking-wider">Funkcje</h3>
+            <ul className="space-y-3">
+              {features.map((feature, i) => (
+                <li key={i} className="flex items-center gap-3 text-sm text-gray-300">
+                  <div className={`rounded-full p-1 bg-white/5 ${colorClass}`}>
+                    <Check className="h-3 w-3" />
+                  </div>
+                  {feature}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {(video || image) && (
+            <div>
+              <h3 className="text-sm font-display font-bold text-white mb-3 uppercase tracking-wider">Podgląd</h3>
+              <div className="h-40 overflow-hidden relative rounded-lg border border-white/10">
+                <div className={`absolute inset-0 bg-gradient-to-t from-background to-transparent z-10`} />
+                {video ? (
+                  <video 
+                    src={video} 
+                    autoPlay 
+                    muted 
+                    loop 
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110 opacity-80 hover:opacity-100" 
+                  />
+                ) : (
+                  <img 
+                    src={image} 
+                    alt={title} 
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110 opacity-80 hover:opacity-100" 
+                  />
+                )}
+              </div>
+            </div>
+          )}
         </CardContent>
 
         <CardFooter>
