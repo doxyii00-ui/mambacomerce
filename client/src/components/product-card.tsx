@@ -71,7 +71,7 @@ export function ProductCard({
           {(video || image) && (
             <div>
               <h3 className="text-sm font-display font-bold text-white mb-3 uppercase tracking-wider">Podgląd</h3>
-              <div className="min-h-56 lg:h-40 overflow-hidden relative rounded-lg border border-white/10">
+              <div className="min-h-56 lg:h-48 overflow-hidden relative rounded-lg border border-white/10">
                 <div className={`absolute inset-0 bg-gradient-to-t from-background to-transparent z-10`} />
                 {video ? (
                   <video 
