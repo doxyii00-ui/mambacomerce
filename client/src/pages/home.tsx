@@ -13,6 +13,7 @@ import obywatelBg from "@assets/generated_images/cyberpunk_digital_id_card_abstr
 import receiptsBg from "@assets/generated_images/cyberpunk_digital_receipt_abstract_background.png";
 import heroBg from "@assets/generated_images/dark_cyberpunk_digital_grid_hero_background.png";
 import obywatelVideo from "@assets/copy_E3111A92-34FD-401C-9AE1-8359E1F1F619_1764588726011.mov";
+import receiptsVideo from "@assets/3B567DDC-82D5-429F-B36F-3192BF8842C3_1764590038254.mov";
 
 type ProductId = "obywatel-app" | "obywatel-pro" | "receipts-month" | "receipts-year";
 
@@ -50,7 +51,7 @@ export default function Home() {
       title: t.products.receiptsMonth.title,
       price: t.products.receiptsMonth.price,
       description: t.products.receiptsMonth.description,
-      image: receiptsBg,
+      video: receiptsVideo,
       features: t.products.receiptsMonth.features,
       accentColor: "secondary" as const,
       name: "MambaReceipts (Monthly)"
@@ -60,7 +61,7 @@ export default function Home() {
       title: t.products.receiptsYear.title,
       price: t.products.receiptsYear.price,
       description: t.products.receiptsYear.description,
-      image: receiptsBg,
+      video: receiptsVideo,
       features: t.products.receiptsYear.features,
       accentColor: "secondary" as const,
       name: "MambaReceipts (Annual)"
