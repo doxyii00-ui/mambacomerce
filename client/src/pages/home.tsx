@@ -156,7 +156,7 @@ export default function Home() {
                   key={product.id}
                   onClick={() => setSelectedProductView(product.id)}
                   whileHover={{ y: -5 }}
-                  className="p-6 rounded-lg bg-gradient-to-br border transition-all"
+                  className="p-6 rounded-lg bg-gradient-to-br border transition-all flex flex-col h-full"
                   style={
                     product.accentColor === "primary"
                       ? {
@@ -179,7 +179,7 @@ export default function Home() {
                   }}>
                     {product.price}
                   </p>
-                  <p className="text-sm text-zinc-400 line-clamp-2">
+                  <p className="text-sm text-zinc-400 flex-1">
                     {product.description}
                   </p>
                 </motion.button>
