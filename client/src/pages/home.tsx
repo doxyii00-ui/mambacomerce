@@ -34,7 +34,7 @@ export default function Home() {
       features: t.products.obywatelApp.features,
       accentColor: "primary" as const,
       name: "MambaObywatel (App)",
-      discordLink: "https://discord.gg/obywatel"
+      discordLink: "https://discord.gg/Ka5TQuWN6s"
     },
     {
       id: "obywatel-pro" as ProductId,
@@ -44,7 +44,7 @@ export default function Home() {
       features: t.products.obywatelPro.features,
       accentColor: "primary" as const,
       name: "MambaObywatel PRO",
-      discordLink: "https://discord.gg/obywatel"
+      discordLink: "https://discord.gg/Ka5TQuWN6s"
     },
     {
       id: "receipts-month" as ProductId,
@@ -55,7 +55,7 @@ export default function Home() {
       features: t.products.receiptsMonth.features,
       accentColor: "secondary" as const,
       name: "MambaReceipts (Monthly)",
-      discordLink: "https://discord.gg/receipts"
+      discordLink: "https://discord.gg/HxGrw2Rf99"
     },
     {
       id: "receipts-year" as ProductId,
@@ -66,7 +66,7 @@ export default function Home() {
       features: t.products.receiptsYear.features,
       accentColor: "secondary" as const,
       name: "MambaReceipts (Annual)",
-      discordLink: "https://discord.gg/receipts"
+      discordLink: "https://discord.gg/HxGrw2Rf99"
     }
   ];
 
