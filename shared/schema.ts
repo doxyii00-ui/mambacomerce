@@ -20,6 +20,14 @@ export const orders = pgTable("orders", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const discordAccess = pgTable("discord_access", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: text("email").notNull(),
+  discordUserId: text("discord_user_id").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
   password: true,
@@ -37,7 +45,18 @@ export const insertOrderSchema = createInsertSchema(orders).omit({
   productId: z.string().min(1, "Product ID required"),
 });
 
+export const insertDiscordAccessSchema = createInsertSchema(discordAccess).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  email: z.string().email("Invalid email address"),
+  discordUserId: z.string().min(1, "Discord User ID required"),
+  expiresAt: z.date(),
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertOrder = z.infer<typeof insertOrderSchema>;
 export type Order = typeof orders.$inferSelect;
+export type InsertDiscordAccess = z.infer<typeof insertDiscordAccessSchema>;
+export type DiscordAccess = typeof discordAccess.$inferSelect;

@@ -1,7 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertOrderSchema } from "@shared/schema";
+import { insertOrderSchema, insertDiscordAccessSchema } from "@shared/schema";
+import { grantDiscordRole } from "./discord-bot";
 import { z } from "zod";
 
 // Validate status values
@@ -139,6 +140,95 @@ export async function registerRoutes(
     } catch (error: any) {
       console.error("Order update error:", error);
       res.status(400).json({ error: "Invalid request data" });
+    }
+  });
+
+  // Grant Discord access endpoint
+  app.post("/api/discord/grant-access", async (req, res) => {
+    try {
+      const { email, discordUserId, orderId, durationDays } = req.body;
+
+      if (!email || !discordUserId || !orderId || !durationDays) {
+        res.status(400).json({ error: "Missing required fields" });
+        return;
+      }
+
+      // Get the order to verify it's for MambaReceipts and is paid
+      const order = await storage.getOrder(orderId);
+      if (!order) {
+        res.status(404).json({ error: "Order not found" });
+        return;
+      }
+
+      if (!order.productId.includes("receipts")) {
+        res.status(400).json({ error: "This product does not grant Discord access" });
+        return;
+      }
+
+      if (order.status !== "paid") {
+        res.status(400).json({ error: "Order is not paid" });
+        return;
+      }
+
+      // Calculate expiry date
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + durationDays);
+
+      // Grant Discord access
+      const discordAccess = await storage.grantDiscordAccess({
+        email: email.toLowerCase(),
+        discordUserId,
+        expiresAt,
+      });
+
+      // Grant Discord role (optional - if role IDs are configured)
+      const guildId = process.env.DISCORD_GUILD_ID;
+      const roleId = process.env.DISCORD_RECEIPTS_ROLE_ID;
+
+      if (guildId && roleId) {
+        const roleGranted = await grantDiscordRole(discordUserId, guildId, roleId);
+        if (!roleGranted) {
+          console.warn("Failed to grant Discord role, but access recorded");
+        }
+      }
+
+      res.json({
+        success: true,
+        accessId: discordAccess.id,
+        expiresAt: discordAccess.expiresAt,
+        message: `Access granted until ${expiresAt.toLocaleDateString()}`,
+      });
+    } catch (error: any) {
+      console.error("Discord access grant error:", error);
+      res.status(400).json({ error: error.message || "Failed to grant access" });
+    }
+  });
+
+  // Check Discord access
+  app.get("/api/discord/access/:email", async (req, res) => {
+    try {
+      const email = emailSchema.parse(req.params.email);
+      const access = await storage.getDiscordAccess(email);
+
+      if (!access) {
+        res.json({ hasAccess: false, expiresAt: null });
+        return;
+      }
+
+      const now = new Date();
+      const hasAccess = access.expiresAt > now;
+
+      res.json({
+        hasAccess,
+        expiresAt: access.expiresAt,
+        daysRemaining: hasAccess
+          ? Math.ceil(
+              (access.expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+            )
+          : 0,
+      });
+    } catch (error: any) {
+      res.status(400).json({ error: "Invalid email format" });
     }
   });
 

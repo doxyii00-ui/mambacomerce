@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Order, type InsertOrder } from "@shared/schema";
+import { type User, type InsertUser, type Order, type InsertOrder, type DiscordAccess, type InsertDiscordAccess } from "@shared/schema";
 import { randomUUID } from "crypto";
 import bcrypt from "bcryptjs";
 
@@ -14,16 +14,20 @@ export interface IStorage {
   getOrderByEmail(email: string): Promise<Order[]>;
   updateOrderStatus(id: string, status: string): Promise<Order | undefined>;
   getOrderByStripeSessionId(sessionId: string): Promise<Order | undefined>;
+  grantDiscordAccess(access: InsertDiscordAccess): Promise<DiscordAccess>;
+  getDiscordAccess(email: string): Promise<DiscordAccess | undefined>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
   private orders: Map<string, Order>;
+  private discordAccesses: Map<string, DiscordAccess>;
   private orderCounter: number;
 
   constructor() {
     this.users = new Map();
     this.orders = new Map();
+    this.discordAccesses = new Map();
     this.orderCounter = 0;
   }
 
@@ -100,6 +104,25 @@ export class MemStorage implements IStorage {
   async getOrderByStripeSessionId(sessionId: string): Promise<Order | undefined> {
     return Array.from(this.orders.values()).find(
       (order) => order.stripeSessionId === sessionId
+    );
+  }
+
+  async grantDiscordAccess(access: InsertDiscordAccess): Promise<DiscordAccess> {
+    const id = randomUUID();
+    const discordAccess: DiscordAccess = {
+      id,
+      email: access.email,
+      discordUserId: access.discordUserId,
+      expiresAt: access.expiresAt,
+      createdAt: new Date(),
+    };
+    this.discordAccesses.set(id, discordAccess);
+    return discordAccess;
+  }
+
+  async getDiscordAccess(email: string): Promise<DiscordAccess | undefined> {
+    return Array.from(this.discordAccesses.values()).find(
+      (access) => access.email === email
     );
   }
 }
