@@ -31,7 +31,6 @@ export default function Home() {
       title: t.products.obywatelApp.title,
       price: t.products.obywatelApp.price,
       description: t.products.obywatelApp.description,
-      video: obywatelVideo,
       features: t.products.obywatelApp.features,
       accentColor: "primary" as const,
       name: "MambaObywatel (App)"
@@ -41,7 +40,6 @@ export default function Home() {
       title: t.products.obywatelPro.title,
       price: t.products.obywatelPro.price,
       description: t.products.obywatelPro.description,
-      image: obywatelBg,
       features: t.products.obywatelPro.features,
       accentColor: "primary" as const,
       name: "MambaObywatel PRO"
