@@ -5,13 +5,14 @@ import { grantDiscordRole } from "./discord-bot";
 
 let stripe: any = null;
 
-async function getStripe() {
+function getStripe() {
   if (!stripe) {
     const apiKey = process.env.STRIPE_SECRET_KEY;
     if (!apiKey) {
       throw new Error("STRIPE_SECRET_KEY not configured");
     }
-    const Stripe = (await import("stripe")).default;
+    // Use require to avoid build-time resolution
+    const Stripe = require("stripe").default || require("stripe");
     stripe = new Stripe(apiKey, {
       apiVersion: "2024-11-20",
     });
@@ -51,7 +52,7 @@ export async function setupStripeWebhook(app: Express): Promise<void> {
       let event;
       try {
         const body = req.rawBody as Buffer;
-        const stripeClient = await getStripe();
+        const stripeClient = getStripe();
         event = stripeClient.webhooks.constructEvent(body, sig, webhookSecret);
         console.log("[Stripe] Event verified, type:", event.type);
       } catch (error) {
