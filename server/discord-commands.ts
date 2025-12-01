@@ -44,8 +44,8 @@ const revokeAccessCommand = new SlashCommandBuilder()
   )
   .setDefaultMemberPermissions(0);
 
-const connectCommand = new SlashCommandBuilder()
-  .setName("connect")
+const polaczCommand = new SlashCommandBuilder()
+  .setName("polacz")
   .setDescription("Połącz swój email z Discordem aby otrzymać dostęp do MambaReceipts")
   .addStringOption((option) =>
     option
@@ -58,8 +58,8 @@ export async function registerDiscordCommands(client: Client) {
   client.on(Events.InteractionCreate, async (interaction) => {
     if (!interaction.isChatInputCommand()) return;
 
-    if (interaction.commandName === "connect") {
-      const email = interaction.options.getString("email");
+    if (interaction.commandName === "polacz") {
+      const email = interaction.options.getString("email") ?? "";
       const userId = interaction.user.id;
       const guildId = interaction.guildId;
 
@@ -70,6 +70,15 @@ export async function registerDiscordCommands(client: Client) {
         if (!discordAccess) {
           await interaction.reply({
             content: `❌ Email \`${email}\` nie ma dostępu do MambaReceipts!`,
+            ephemeral: true,
+          });
+          return;
+        }
+
+        // Check if email is already connected to different Discord user
+        if (discordAccess.discordUserId && discordAccess.discordUserId !== "pending" && discordAccess.discordUserId !== userId) {
+          await interaction.reply({
+            content: `❌ Ten email został już połączony z innym konta Discord! Każdy zakup można używać tylko raz.`,
             ephemeral: true,
           });
           return;
@@ -98,7 +107,7 @@ export async function registerDiscordCommands(client: Client) {
           ephemeral: true,
         });
       } catch (error: any) {
-        console.error("[Discord] Error in /connect command:", error);
+        console.error("[Discord] Error in /polacz command:", error);
         await interaction.reply({
           content: "❌ Błąd podczas łączenia. Spróbuj ponownie!",
           ephemeral: true,
@@ -262,13 +271,13 @@ export async function registerSlashCommands(
 
     console.log("Registering slash commands...");
 
-    const commands = [grantAccessCommand.toJSON(), revokeAccessCommand.toJSON(), connectCommand.toJSON()];
+    const commands = [grantAccessCommand.toJSON(), revokeAccessCommand.toJSON(), polaczCommand.toJSON()];
 
     await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
       body: commands,
     });
 
-    console.log("Successfully registered slash commands: /grantaccess, /odbierz, /connect");
+    console.log("Successfully registered slash commands: /grantaccess, /odbierz, /polacz");
   } catch (error) {
     console.error("Error registering slash commands:", error);
   }
