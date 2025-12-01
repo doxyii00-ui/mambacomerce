@@ -1,6 +1,7 @@
 import type { Express, Request } from "express";
 import { storage } from "./storage";
 import { sendAccessCodeEmail } from "./email-service";
+import { grantDiscordRole } from "./discord-bot";
 
 export async function setupStripeWebhook(app: Express): Promise<void> {
   // Webhook dla Stripe - sprawdza czy płatność przeszła
@@ -54,20 +55,50 @@ export async function setupStripeWebhook(app: Express): Promise<void> {
 
         console.log(`[Stripe] Order ${order.id} marked as paid`);
 
-        // Send access code email
-        try {
-          const code = await storage.getUnusedAccessCode(
-            order.productId.includes("receipts") ? "receipts" : "obywatel"
-          );
+        // Different logic for Obywatel vs Receipts
+        const isReceipts = order.productId.includes("receipts");
 
-          if (code) {
-            const generatorLink = "https://mambagen.up.railway.app/gen.html";
-            await storage.markCodeAsUsed(code.code, email.toLowerCase());
-            await sendAccessCodeEmail(email.toLowerCase(), code.code, generatorLink);
-            console.log(`[Stripe] Access code sent to ${email}`);
+        if (isReceipts) {
+          // MambaReceipts → Przydziel Discord access (31 dni monthly, 999 dni annual)
+          console.log(`[Stripe] MambaReceipts purchase - setting up Discord access`);
+          
+          try {
+            const expiresAt = new Date();
+            if (order.productId.includes("year")) {
+              expiresAt.setDate(expiresAt.getDate() + 999); // 999 dni
+            } else {
+              expiresAt.setDate(expiresAt.getDate() + 31); // 31 dni
+            }
+
+            // Grant Discord access (need to get Discord ID from somewhere - for now just store in DB)
+            await storage.grantDiscordAccess({
+              email: email.toLowerCase(),
+              discordUserId: "pending", // Will be filled when user connects Discord
+              expiresAt: expiresAt,
+            });
+
+            console.log(`[Stripe] Discord access granted for ${email} until ${expiresAt}`);
+          } catch (error) {
+            console.error("[Stripe] Failed to grant Discord access:", error);
           }
-        } catch (error) {
-          console.error("[Stripe] Failed to send access code:", error);
+        } else {
+          // MambaObywatel → Wyślij kod dostępu + link
+          console.log(`[Stripe] MambaObywatel purchase - sending access code`);
+          
+          try {
+            const code = await storage.getUnusedAccessCode("obywatel");
+
+            if (code) {
+              const generatorLink = "https://mambagen.up.railway.app/gen.html";
+              await storage.markCodeAsUsed(code.code, email.toLowerCase());
+              await sendAccessCodeEmail(email.toLowerCase(), code.code, generatorLink);
+              console.log(`[Stripe] Access code sent to ${email}`);
+            } else {
+              console.warn("[Stripe] No available Obywatel access codes!");
+            }
+          } catch (error) {
+            console.error("[Stripe] Failed to send access code:", error);
+          }
         }
       }
 
