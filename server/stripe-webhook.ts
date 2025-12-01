@@ -6,7 +6,7 @@ import { grantDiscordRole } from "./discord-bot";
 // Mapping linków Stripe do produktów
 const STRIPE_LINK_MAPPING: { [key: string]: { type: "obywatel" | "receipts"; tier?: "basic" | "premium"; duration?: number } } = {
   "6oU28s5Fo3PjaHLfRCgEg06": { type: "obywatel", tier: "premium" }, // obywatel 200 - ticket
-  "test_6oU28r2O8f6v3eI0C9cEw00": { type: "obywatel", tier: "basic" }, // obywatel 20 - kod
+  "28E4gA0l499Dg25eNygEg00": { type: "obywatel", tier: "basic" }, // obywatel 20 - kod
   "9B600k7NwbhLdTXdJugEg02": { type: "receipts", duration: 31 }, // receipts 20 (monthly)
   "5kQ00k8RA5Xr2bfdJugEg03": { type: "receipts", duration: 999 }, // receipts 60 (annual)
 };
