@@ -15,7 +15,7 @@ import heroBg from "@assets/generated_images/dark_cyberpunk_digital_grid_hero_ba
 import obywatelVideo from "@assets/copy_E3111A92-34FD-401C-9AE1-8359E1F1F619_1764588726011.mov";
 import receiptsVideo from "@assets/3B567DDC-82D5-429F-B36F-3192BF8842C3_1764590038254.mov";
 
-type ProductId = "obywatel-app" | "obywatel-pro" | "receipts-month" | "receipts-year";
+type ProductId = "obywatel-app" | "obywatel-pro" | "receipts-month" | "receipts-year" | "generator";
 
 export default function Home() {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -45,7 +45,8 @@ export default function Home() {
       features: t.products.obywatelPro.features,
       accentColor: "primary" as const,
       name: "MambaObywatel PRO",
-      discordLink: "https://discord.gg/Ka5TQuWN6s"
+      discordLink: "https://discord.gg/Ka5TQuWN6s",
+      stripeLink: "https://buy.stripe.com/4gMeVe8RAbhL6rvbBmgEg01"
     },
     {
       id: "receipts-month" as ProductId,
