@@ -3,6 +3,7 @@ import postgres from "postgres";
 import { accessCodes } from "@shared/schema";
 import { ALL_ACCESS_CODES } from "./access-codes";
 import { sql } from "drizzle-orm";
+import { randomUUID } from "crypto";
 
 export async function initializeDatabase() {
   if (!process.env.DATABASE_URL) {
@@ -90,6 +91,7 @@ export async function initializeDatabase() {
         try {
           await db.insert(accessCodes).values(
             batch.map((code: string, idx: number) => ({
+              id: randomUUID(),
               code,
               productType: i + idx < 200 ? "obywatel" : "receipts",
               isUsed: "false",
