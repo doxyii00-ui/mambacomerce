@@ -35,7 +35,7 @@ export default function Home() {
       accentColor: "primary" as const,
       name: "MambaObywatel (App)",
       discordLink: "https://discord.gg/Ka5TQuWN6s",
-      stripeLink: "https://buy.stripe.com/9B600k7NwbhLdTXdJugEg02"
+      stripeLink: "https://buy.stripe.com/28E4gA0l499Dg25eNygEg00"
     },
     {
       id: "obywatel-pro" as ProductId,
@@ -46,7 +46,7 @@ export default function Home() {
       accentColor: "primary" as const,
       name: "MambaObywatel PRO",
       discordLink: "https://discord.gg/Ka5TQuWN6s",
-      stripeLink: "https://buy.stripe.com/4gMeVe8RAbhL6rvbBmgEg01"
+      stripeLink: "https://buy.stripe.com/6oU28s5Fo3PjaHLfRCgEg06"
     },
     {
       id: "receipts-month" as ProductId,
