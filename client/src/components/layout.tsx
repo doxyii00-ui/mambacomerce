@@ -54,12 +54,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <nav className="hidden md:flex items-center gap-8">
             <NavContent />
             <LanguageSwitcher />
-            <Button 
-              variant="outline" 
-              className="border-primary/50 text-primary hover:bg-primary hover:text-black font-mono text-xs uppercase tracking-widest"
-            >
-              {t.nav.login}
-            </Button>
+            <Link href="/auth">
+              <Button 
+                variant="outline" 
+                className="border-primary/50 text-primary hover:bg-primary hover:text-black font-mono text-xs uppercase tracking-widest cursor-pointer"
+              >
+                {t.nav.login}
+              </Button>
+            </Link>
           </nav>
 
           {/* Mobile Nav */}
@@ -74,6 +76,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <SheetContent side="right" className="bg-card/95 backdrop-blur-xl border-l border-white/10">
                 <div className="flex flex-col gap-6 mt-10">
                   <NavContent />
+                  <Link href="/auth" onClick={() => setIsOpen(false)}>
+                    <Button className="w-full bg-primary text-black hover:bg-primary/90 font-mono text-xs uppercase tracking-widest">
+                      {t.nav.login}
+                    </Button>
+                  </Link>
                 </div>
               </SheetContent>
             </Sheet>
