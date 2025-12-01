@@ -1,3 +1,70 @@
+export function generateReceiptsEmail(email: string, expiresAt: Date): { subject: string; html: string } {
+  return {
+    subject: "Twój dostęp do MambaReceipts 🐍",
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body { font-family: 'Inter', Arial, sans-serif; background: #000; color: #fff; line-height: 1.6; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { text-align: center; padding: 20px 0; border-bottom: 2px solid #a855f7; margin-bottom: 30px; }
+            .logo { font-size: 28px; font-weight: bold; color: #a855f7; text-shadow: 0 0 10px rgba(168, 85, 247, 0.5); }
+            .content { background: #1a1a1a; padding: 30px; border: 1px solid #333; border-radius: 8px; margin-bottom: 20px; }
+            .thank-you { font-size: 24px; color: #a855f7; margin-bottom: 20px; font-weight: bold; }
+            .instructions { background: #1a1a1a; border-left: 4px solid #a855f7; padding: 15px; margin: 20px 0; }
+            .step { margin: 10px 0; font-size: 14px; }
+            .step-num { color: #a855f7; font-weight: bold; }
+            .command { background: #0a0a0a; border: 2px solid #a855f7; border-radius: 6px; padding: 15px; margin: 20px 0; text-align: center; font-family: monospace; }
+            .code { font-size: 18px; font-family: 'Courier New', monospace; font-weight: bold; color: #a855f7; letter-spacing: 1px; }
+            .expiry { background: #a855f7/20; border: 1px solid #a855f7/30; padding: 15px; border-radius: 6px; margin: 20px 0; }
+            .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #333; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <div class="logo">🐍 MAMBA RECEIPTS</div>
+            </div>
+            
+            <div class="content">
+              <div class="thank-you">Dziękujemy za Twoją transakcję!</div>
+              
+              <p>Twoje zamówienie MambaReceipts zostało potwierdzone. Aby aktywować dostęp, użyj poniższej komendy na naszym serwerze Discord:</p>
+              
+              <div class="command">
+                <div class="code">/polacz ${email}</div>
+              </div>
+              
+              <div class="instructions">
+                <div style="font-weight: bold; margin-bottom: 10px;">📋 Instrukcja aktywacji:</div>
+                <div class="step"><span class="step-num">1.</span> Dołącz do naszego serwera Discord (zaproszenie otrzymałeś w emailu zakupu)</div>
+                <div class="step"><span class="step-num">2.</span> Wpisz komendę: <span class="code">/polacz ${email}</span></div>
+                <div class="step"><span class="step-num">3.</span> Bot automatycznie przydzieli Ci dostęp! 🎉</div>
+              </div>
+
+              <div class="expiry">
+                <div style="font-weight: bold; color: #a855f7; margin-bottom: 8px;">⏰ Ewa dostępu:</div>
+                <div>${expiresAt.toLocaleDateString("pl-PL")}</div>
+              </div>
+              
+              <p style="color: #999; font-size: 12px;">
+                ⚠️ Każdy email może być używany tylko jeden raz. Po wpisaniu komendy dostęp będzie przypisany do Twojego konta Discord.
+              </p>
+            </div>
+            
+            <div class="footer">
+              <p>© 2025 Mamba Services. Wszystkie prawa zastrzeżone.</p>
+              <p>Email wysłany do: ${email}</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `,
+  };
+}
+
 export function generateAccessCodeEmail(email: string, code: string, generatorLink: string): { subject: string; html: string } {
   return {
     subject: "Twój kod dostępu do Mamba Services 🐍",
@@ -58,6 +125,45 @@ export function generateAccessCodeEmail(email: string, code: string, generatorLi
       </html>
     `,
   };
+}
+
+export async function sendReceiptsEmail(email: string, expiresAt: Date): Promise<boolean> {
+  const apiKey = process.env.RESEND_API_KEY;
+  
+  if (!apiKey) {
+    console.warn("[Email] RESEND_API_KEY not configured - email not sent");
+    return false;
+  }
+
+  try {
+    const emailContent = generateReceiptsEmail(email, expiresAt);
+    
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "onboarding@resend.dev",
+        to: email,
+        subject: emailContent.subject,
+        html: emailContent.html,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error("[Email] Failed to send:", error);
+      return false;
+    }
+
+    console.log(`[Email] Successfully sent Receipts instructions to ${email}`);
+    return true;
+  } catch (error) {
+    console.error("[Email] Error sending email:", error);
+    return false;
+  }
 }
 
 export async function sendAccessCodeEmail(email: string, code: string, generatorLink: string): Promise<boolean> {
