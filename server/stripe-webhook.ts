@@ -1,6 +1,6 @@
 import type { Express, Request } from "express";
 import { storage } from "./storage";
-import { sendAccessCodeEmail } from "./email-service";
+import { sendAccessCodeEmail, sendReceiptsEmail } from "./email-service";
 import { grantDiscordRole } from "./discord-bot";
 
 // Mapping linków Stripe do produktów
@@ -80,6 +80,9 @@ export async function setupStripeWebhook(app: Express): Promise<void> {
               discordUserId: "pending", // Will be filled when user connects Discord
               expiresAt: expiresAt,
             });
+
+            // Send email with Discord /polacz instruction
+            await sendReceiptsEmail(email.toLowerCase(), expiresAt);
 
             console.log(`[Stripe] Discord access granted for ${email} until ${expiresAt}`);
           } catch (error) {
