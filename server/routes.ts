@@ -4,7 +4,6 @@ import { storage } from "./storage";
 import { insertOrderSchema, insertDiscordAccessSchema } from "@shared/schema";
 import { grantDiscordRole } from "./discord-bot";
 import { sendAccessCodeEmail } from "./email-service";
-import { setupStripeWebhook } from "./stripe-webhook";
 import { z } from "zod";
 
 // Validate status values
@@ -22,8 +21,7 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-  // Setup Stripe webhook
-  await setupStripeWebhook(app);
+  // NOTE: Stripe webhook is setup in index.ts BEFORE registerRoutes
 
   // Auth endpoints
   app.post("/api/auth/signup", async (req, res) => {
