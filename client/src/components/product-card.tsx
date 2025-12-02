@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription }
 
 interface SellAuthConfig {
   productId: number;
-  variantId: number;
+  variantId?: number;
   shopId: number;
 }
 
@@ -40,12 +40,15 @@ export function ProductCard({
 }: ProductCardProps) {
   const handlePurchaseClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (sellAuthConfig && window.sellAuthEmbed) {
+      const cartItem: { productId: number; quantity: number; variantId?: number } = { 
+        productId: sellAuthConfig.productId, 
+        quantity: 1 
+      };
+      if (sellAuthConfig.variantId) {
+        cartItem.variantId = sellAuthConfig.variantId;
+      }
       window.sellAuthEmbed.checkout(e.currentTarget, {
-        cart: [{ 
-          productId: sellAuthConfig.productId, 
-          variantId: sellAuthConfig.variantId, 
-          quantity: 1 
-        }],
+        cart: [cartItem],
         shopId: sellAuthConfig.shopId,
         modal: true
       });

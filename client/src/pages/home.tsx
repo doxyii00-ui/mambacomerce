@@ -1,7 +1,6 @@
 import { Layout } from "@/components/layout";
 import { ProductCard } from "@/components/product-card";
 import { CheckoutDialog } from "@/components/checkout-dialog";
-import { SellAuthCheckoutModal } from "@/components/sellauth-checkout-modal";
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
@@ -16,12 +15,12 @@ import heroBg from "@assets/generated_images/dark_cyberpunk_digital_grid_hero_ba
 import obywatelVideo from "@assets/copy_E3111A92-34FD-401C-9AE1-8359E1F1F619_1764588726011.mov";
 import receiptsVideo from "@assets/3B567DDC-82D5-429F-B36F-3192BF8842C3_1764590038254.mov";
 
+const SELLAUTH_SHOP_ID = 91082;
+
 type ProductId = "obywatel-app" | "obywatel-pro" | "receipts-month" | "receipts-year" | "generator";
 
 export default function Home() {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
-  const [sellAuthModalOpen, setSellAuthModalOpen] = useState(false);
-  const [sellAuthCheckoutUrl, setSellAuthCheckoutUrl] = useState("");
   const [selectedProductView, setSelectedProductView] = useState<ProductId | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<{ name: string; price: string; id: string } | null>(null);
   const [_, setLocation] = useLocation();
@@ -38,7 +37,7 @@ export default function Home() {
       accentColor: "primary" as const,
       name: "MambaObywatel (App)",
       discordLink: "https://discord.gg/Ka5TQuWN6s",
-      sellAuthUrl: "https://mambaservice.mysellauth.com/product/mambaobywatelapka"
+      sellAuthConfig: { productId: 543246, shopId: SELLAUTH_SHOP_ID }
     },
     {
       id: "obywatel-pro" as ProductId,
@@ -49,7 +48,7 @@ export default function Home() {
       accentColor: "primary" as const,
       name: "MambaObywatel PRO",
       discordLink: "https://discord.gg/Ka5TQuWN6s",
-      sellAuthUrl: "https://mambaservice.mysellauth.com/product/mambagenerator"
+      sellAuthConfig: { productId: 543250, shopId: SELLAUTH_SHOP_ID }
     },
     {
       id: "receipts-month" as ProductId,
@@ -61,7 +60,7 @@ export default function Home() {
       accentColor: "secondary" as const,
       name: "MambaReceipts (Monthly)",
       discordLink: "https://discord.gg/HxGrw2Rf99",
-      sellAuthUrl: "https://mambaservice.mysellauth.com/product/mambareceipts-1-month",
+      sellAuthConfig: { productId: 543372, shopId: SELLAUTH_SHOP_ID },
       requiresDiscordBeforePurchase: true
     },
     {
@@ -74,7 +73,7 @@ export default function Home() {
       accentColor: "secondary" as const,
       name: "MambaReceipts (Annual)",
       discordLink: "https://discord.gg/HxGrw2Rf99",
-      sellAuthUrl: "https://mambaservice.mysellauth.com/product/mambareceipts-lifetime",
+      sellAuthConfig: { productId: 543373, shopId: SELLAUTH_SHOP_ID },
       requiresDiscordBeforePurchase: true
     }
   ];
@@ -217,11 +216,7 @@ export default function Home() {
                   features={selectedProductData.features}
                   accentColor={selectedProductData.accentColor}
                   discordLink={selectedProductData.discordLink}
-                  sellAuthUrl={selectedProductData.sellAuthUrl}
-                  onSellAuthBuy={(url) => {
-                    setSellAuthCheckoutUrl(url);
-                    setSellAuthModalOpen(true);
-                  }}
+                  sellAuthConfig={selectedProductData.sellAuthConfig}
                   requiresDiscordBeforePurchase={(selectedProductData as any).requiresDiscordBeforePurchase}
                   onBuy={() => handleBuy({
                     name: selectedProductData.name,
@@ -242,12 +237,6 @@ export default function Home() {
         price={selectedProduct?.price || ""}
         productId={selectedProduct?.id || ""}
         onSuccess={handleSuccess}
-      />
-
-      <SellAuthCheckoutModal
-        open={sellAuthModalOpen}
-        onOpenChange={setSellAuthModalOpen}
-        checkoutUrl={sellAuthCheckoutUrl}
       />
     </Layout>
   );

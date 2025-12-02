@@ -1,7 +1,7 @@
 interface SellAuthCheckoutConfig {
   cart: Array<{
     productId: number;
-    variantId: number;
+    variantId?: number;
     quantity: number;
   }>;
   shopId: number;
