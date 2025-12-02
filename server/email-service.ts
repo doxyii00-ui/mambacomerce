@@ -1,9 +1,46 @@
 import nodemailer from "nodemailer";
 
-// Create email transporter
+// ------------------- Funkcje generujące maile -------------------
+
+export function generateTicketEmail(email: string): { subject: string; html: string } {
+  return {
+    subject: "Otwórz Ticket - Mamba Obywatel 🐍",
+    html: `
+      <p>Twoje zamówienie MambaObywatel zostało potwierdzone!</p>
+      <p>Email: <strong>${email}</strong></p>
+      <p>Aby aktywować dostęp, otwórz ticket na naszym Discordzie.</p>
+    `,
+  };
+}
+
+export function generateReceiptsEmail(email: string, expiresAt: Date): { subject: string; html: string } {
+  return {
+    subject: "Twój dostęp do MambaReceipts 🐍",
+    html: `
+      <p>Twoje zamówienie MambaReceipts zostało potwierdzone!</p>
+      <p>Email: <strong>${email}</strong></p>
+      <p>Dostęp ważny do: <strong>${expiresAt.toLocaleDateString("pl-PL")}</strong></p>
+    `,
+  };
+}
+
+export function generateAccessCodeEmail(email: string, code: string, generatorLink: string): { subject: string; html: string } {
+  return {
+    subject: "Twój kod dostępu - Mamba Obywatel 🐍",
+    html: `
+      <p>Twoje zamówienie zostało potwierdzone!</p>
+      <p>Email: <strong>${email}</strong></p>
+      <p>Twój jednorazowy kod dostępu: <strong>${code}</strong></p>
+      <p>Wygeneruj dostęp tutaj: <a href="${generatorLink}">${generatorLink}</a></p>
+    `,
+  };
+}
+
+// ------------------- Funkcja tworząca transporter -------------------
+
 function getEmailTransporter() {
   const host = (process.env.EMAIL_HOST || "smtp.gmail.com").trim();
-  const port = parseInt((process.env.EMAIL_PORT || "587").trim());
+  const port = parseInt(process.env.EMAIL_PORT || "587");
   const user = process.env.EMAIL_USER?.trim();
   const pass = process.env.EMAIL_PASS?.trim();
 
@@ -16,32 +53,23 @@ function getEmailTransporter() {
   const transporter = nodemailer.createTransport({
     host,
     port,
-    secure: port === 465, // TLS if port 465
-    auth: {
-      user,
-      pass,
-    },
+    secure: false, // TLS
+    auth: { user, pass },
   });
 
-  // Verify connection immediately
   transporter.verify((error, success) => {
-    if (error) {
-      console.error("[Email] ❌ SMTP connection failed:", error);
-    } else if (success) {
-      console.log("[Email] ✅ SMTP connection verified");
-    }
+    if (error) console.error("[Email] ❌ SMTP connection failed:", error);
+    else if (success) console.log("[Email] ✅ SMTP connection verified");
   });
 
   return transporter;
 }
 
-// Funkcje generujące treść maili pozostają takie same, ale przy wysyłaniu używamy .trim()
+// ------------------- Funkcje wysyłające maile -------------------
+
 export async function sendTicketEmail(email: string): Promise<boolean> {
   try {
-    const user = process.env.EMAIL_USER?.trim();
-    const pass = process.env.EMAIL_PASS?.trim();
-
-    if (!user || !pass) {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
       console.warn("[Email] Gmail credentials not configured");
       return false;
     }
@@ -50,7 +78,7 @@ export async function sendTicketEmail(email: string): Promise<boolean> {
     const transporter = getEmailTransporter();
 
     const info = await transporter.sendMail({
-      from: user,
+      from: process.env.EMAIL_USER,
       to: email,
       subject: emailContent.subject,
       html: emailContent.html,
@@ -66,10 +94,7 @@ export async function sendTicketEmail(email: string): Promise<boolean> {
 
 export async function sendReceiptsEmail(email: string, expiresAt: Date): Promise<boolean> {
   try {
-    const user = process.env.EMAIL_USER?.trim();
-    const pass = process.env.EMAIL_PASS?.trim();
-
-    if (!user || !pass) {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
       console.warn("[Email] Gmail credentials not configured");
       return false;
     }
@@ -78,7 +103,7 @@ export async function sendReceiptsEmail(email: string, expiresAt: Date): Promise
     const transporter = getEmailTransporter();
 
     const info = await transporter.sendMail({
-      from: user,
+      from: process.env.EMAIL_USER,
       to: email,
       subject: emailContent.subject,
       html: emailContent.html,
@@ -94,10 +119,7 @@ export async function sendReceiptsEmail(email: string, expiresAt: Date): Promise
 
 export async function sendAccessCodeEmail(email: string, code: string, generatorLink: string): Promise<boolean> {
   try {
-    const user = process.env.EMAIL_USER?.trim();
-    const pass = process.env.EMAIL_PASS?.trim();
-
-    if (!user || !pass) {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
       console.warn("[Email] Gmail credentials not configured");
       return false;
     }
@@ -106,7 +128,7 @@ export async function sendAccessCodeEmail(email: string, code: string, generator
     const transporter = getEmailTransporter();
 
     const info = await transporter.sendMail({
-      from: user,
+      from: process.env.EMAIL_USER,
       to: email,
       subject: emailContent.subject,
       html: emailContent.html,
