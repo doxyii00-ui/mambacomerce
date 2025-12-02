@@ -55,7 +55,7 @@ async function buildAll() {
       "process.env.NODE_ENV": '"production"',
     },
     minify: true,
-    external: [...externals, "stripe"],
+    external: [...externals, "stripe", "nodemailer", "./init-db", "./routes", "./storage", "./discord-bot", "./discord-commands", "./stripe-webhook", "./email-service"],
     logLevel: "info",
   });
 }
