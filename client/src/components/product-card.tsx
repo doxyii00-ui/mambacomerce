@@ -1,13 +1,7 @@
 import { motion } from "framer-motion";
-import { Check, ArrowRight, MessageCircle, AlertCircle } from "lucide-react";
+import { Check, ArrowRight, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-
-interface SellAuthConfig {
-  productId: number;
-  variantId?: number;
-  shopId: number;
-}
 
 interface ProductCardProps {
   title: string;
@@ -20,8 +14,8 @@ interface ProductCardProps {
   onBuy: () => void;
   discordLink?: string;
   stripeLink?: string;
-  sellAuthConfig?: SellAuthConfig;
-  requiresDiscordBeforePurchase?: boolean;
+  checkoutLink?: string;
+  discordOnlyPurchase?: boolean;
 }
 
 export function ProductCard({ 
@@ -35,23 +29,20 @@ export function ProductCard({
   onBuy,
   discordLink,
   stripeLink,
-  sellAuthConfig,
-  requiresDiscordBeforePurchase
+  checkoutLink,
+  discordOnlyPurchase
 }: ProductCardProps) {
-  const handlePurchaseClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (sellAuthConfig && window.sellAuthEmbed) {
-      const cartItem: { productId: number; quantity: number; variantId?: number } = { 
-        productId: sellAuthConfig.productId, 
-        quantity: 1 
-      };
-      if (sellAuthConfig.variantId) {
-        cartItem.variantId = sellAuthConfig.variantId;
-      }
-      window.sellAuthEmbed.checkout(e.currentTarget, {
-        cart: [cartItem],
-        shopId: sellAuthConfig.shopId,
-        modal: true
-      });
+  const handlePurchaseClick = () => {
+    if (checkoutLink) {
+      const width = 500;
+      const height = 700;
+      const left = (window.innerWidth - width) / 2;
+      const top = (window.innerHeight - height) / 2;
+      window.open(
+        checkoutLink,
+        'SellAuth Checkout',
+        `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
+      );
     } else if (stripeLink) {
       window.open(stripeLink, '_blank');
     } else {
@@ -126,17 +117,26 @@ export function ProductCard({
             </div>
           )}
 
-          {requiresDiscordBeforePurchase && (
-            <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/5 border border-amber-500/40 rounded-lg p-4">
-              <h3 className="text-sm font-display font-bold text-amber-100 mb-2 flex items-center gap-2 uppercase tracking-wider">
-                <AlertCircle className="h-4 w-4 text-amber-500" />
-                Ważne Ostrzeżenie
+          {discordOnlyPurchase && discordLink && (
+            <div className="bg-gradient-to-r from-[#5865F2]/10 to-[#5865F2]/5 border border-[#5865F2]/30 rounded-lg p-4">
+              <h3 className="text-sm font-display font-bold text-white mb-2 flex items-center gap-2 uppercase tracking-wider">
+                <MessageCircle className="h-4 w-4 text-[#5865F2]" />
+                Jak Kupić
               </h3>
-              <p className="text-xs text-amber-100/80">Przed zakupem musisz dołączyć na nasz serwer Discord, aby otrzymać dostęp do produktu i wsparcia technicznego.</p>
+              <p className="text-sm text-gray-300 mb-4">Aby zakupić generator paragonów, otwórz ticket na Discordzie.</p>
+              <a 
+                href={discordLink} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-[#5865F2] hover:bg-[#4752C4] text-white px-4 py-2 rounded-lg transition-colors text-sm font-mono font-bold"
+              >
+                <MessageCircle className="h-4 w-4" />
+                Dołącz do Discorda <ArrowRight className="h-3 w-3" />
+              </a>
             </div>
           )}
 
-          {discordLink && (
+          {!discordOnlyPurchase && discordLink && (
             <div className="bg-gradient-to-r from-[#5865F2]/10 to-[#5865F2]/5 border border-[#5865F2]/30 rounded-lg p-4">
               <h3 className="text-sm font-display font-bold text-white mb-2 flex items-center gap-2 uppercase tracking-wider">
                 <MessageCircle className="h-4 w-4 text-[#5865F2]" />
@@ -155,14 +155,16 @@ export function ProductCard({
           )}
         </CardContent>
 
-        <CardFooter>
-          <Button 
-            className={`w-full font-mono font-bold tracking-wider uppercase ${buttonClass}`}
-            onClick={handlePurchaseClick}
-          >
-            Buy Now <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        </CardFooter>
+        {!discordOnlyPurchase && (
+          <CardFooter>
+            <Button 
+              className={`w-full font-mono font-bold tracking-wider uppercase ${buttonClass}`}
+              onClick={handlePurchaseClick}
+            >
+              Buy Now <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </CardFooter>
+        )}
       </Card>
     </motion.div>
   );
