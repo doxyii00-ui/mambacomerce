@@ -9,7 +9,7 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { accessCodes } from "@shared/schema";
 import { randomUUID } from "crypto";
-import { setupStripeWebhook } from "./stripe";
+import { setupStripeWebhook } from "./stripe-webhook";
 
 const app = express();
 const httpServer = createServer(app);
