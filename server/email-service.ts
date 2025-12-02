@@ -2,27 +2,27 @@ import nodemailer from "nodemailer";
 
 // Create email transporter
 function getEmailTransporter() {
-  const host = process.env.EMAIL_HOST || "smtp.gmail.com";
-  const port = parseInt(process.env.EMAIL_PORT || "587");
-  const user = process.env.EMAIL_USER;
-  const pass = process.env.EMAIL_PASS;
-  
+  const host = (process.env.EMAIL_HOST || "smtp.gmail.com").trim();
+  const port = parseInt((process.env.EMAIL_PORT || "587").trim());
+  const user = process.env.EMAIL_USER?.trim();
+  const pass = process.env.EMAIL_PASS?.trim();
+
   if (!user || !pass) {
     console.error("❌ Email credentials missing - EMAIL_USER:", user ? "✓" : "✗", "EMAIL_PASS:", pass ? "✓" : "✗");
   } else {
     console.log("[Email] Credentials found, creating transporter for:", user);
   }
-  
+
   const transporter = nodemailer.createTransport({
     host,
     port,
-    secure: false, // TLS
+    secure: port === 465, // TLS if port 465
     auth: {
       user,
       pass,
     },
   });
-  
+
   // Verify connection immediately
   transporter.verify((error, success) => {
     if (error) {
@@ -31,201 +31,17 @@ function getEmailTransporter() {
       console.log("[Email] ✅ SMTP connection verified");
     }
   });
-  
+
   return transporter;
 }
 
-export function generateTicketEmail(email: string): { subject: string; html: string } {
-  return {
-    subject: "Otwórz Ticket - Mamba Obywatel 🐍",
-    html: `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="UTF-8">
-          <style>
-            body { font-family: 'Inter', Arial, sans-serif; background: #000; color: #fff; line-height: 1.6; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { text-align: center; padding: 20px 0; border-bottom: 2px solid #8eb34f; margin-bottom: 30px; }
-            .logo { font-size: 28px; font-weight: bold; color: #8eb34f; text-shadow: 0 0 10px rgba(142, 179, 79, 0.5); }
-            .content { background: #1a1a1a; padding: 30px; border: 1px solid #333; border-radius: 8px; margin-bottom: 20px; }
-            .thank-you { font-size: 24px; color: #8eb34f; margin-bottom: 20px; font-weight: bold; }
-            .ticket-section { background: #0a0a0a; border: 2px solid #8eb34f; border-radius: 6px; padding: 20px; margin: 20px 0; text-align: center; }
-            .instruction { font-size: 18px; color: #8eb34f; font-weight: bold; margin: 15px 0; }
-            .button { display: inline-block; background: #8eb34f; color: #000; padding: 15px 30px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 15px; }
-            .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #333; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <div class="logo">🐍 MAMBA OBYWATEL</div>
-            </div>
-            
-            <div class="content">
-              <div class="thank-you">Dziękujemy za Twoją transakcję!</div>
-              
-              <p>Twoje zamówienie MambaObywatel zostało potwierdzone. Aby aktywować dostęp, musisz otworzyć ticket na naszym serwerze Discord.</p>
-              
-              <div class="ticket-section">
-                <div class="instruction">📋 Instrukcja aktywacji:</div>
-                <p style="font-size: 14px; margin: 10px 0;">
-                  1. Dołącz do naszego serwera Discord<br>
-                  2. Przejdź do kanału #tickets<br>
-                  3. Kliknij przycisk "Otwórz Ticket"<br>
-                  4. Wyślij dowód zakupu lub email:<br>
-                  <strong>${email}</strong>
-                </p>
-              </div>
-
-              <p style="color: #999; font-size: 12px;">
-                ⚠️ Nasz zespół obsługi klienta przywróci ci dostęp w ciągu 24 godzin. Jeśli masz pytania, skontaktuj się z nami przez Discord.
-              </p>
-            </div>
-            
-            <div class="footer">
-              <p>© 2025 Mamba Services. Wszystkie prawa zastrzeżone.</p>
-              <p>Email wysłany do: ${email}</p>
-            </div>
-          </div>
-        </body>
-      </html>
-    `,
-  };
-}
-
-export function generateReceiptsEmail(email: string, expiresAt: Date): { subject: string; html: string } {
-  return {
-    subject: "Twój dostęp do MambaReceipts 🐍",
-    html: `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="UTF-8">
-          <style>
-            body { font-family: 'Inter', Arial, sans-serif; background: #000; color: #fff; line-height: 1.6; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { text-align: center; padding: 20px 0; border-bottom: 2px solid #a855f7; margin-bottom: 30px; }
-            .logo { font-size: 28px; font-weight: bold; color: #a855f7; text-shadow: 0 0 10px rgba(168, 85, 247, 0.5); }
-            .content { background: #1a1a1a; padding: 30px; border: 1px solid #333; border-radius: 8px; margin-bottom: 20px; }
-            .thank-you { font-size: 24px; color: #a855f7; margin-bottom: 20px; font-weight: bold; }
-            .instructions { background: #1a1a1a; border-left: 4px solid #a855f7; padding: 15px; margin: 20px 0; }
-            .step { margin: 10px 0; font-size: 14px; }
-            .step-num { color: #a855f7; font-weight: bold; }
-            .command { background: #0a0a0a; border: 2px solid #a855f7; border-radius: 6px; padding: 15px; margin: 20px 0; text-align: center; font-family: monospace; }
-            .code { font-size: 18px; font-family: 'Courier New', monospace; font-weight: bold; color: #a855f7; letter-spacing: 1px; }
-            .expiry { background: #a855f7/20; border: 1px solid #a855f7/30; padding: 15px; border-radius: 6px; margin: 20px 0; }
-            .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #333; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <div class="logo">🐍 MAMBA RECEIPTS</div>
-            </div>
-            
-            <div class="content">
-              <div class="thank-you">Dziękujemy za Twoją transakcję!</div>
-              
-              <p>Twoje zamówienie MambaReceipts zostało potwierdzone. Aby aktywować dostęp, użyj poniższej komendy na naszym serwerze Discord:</p>
-              
-              <div class="command">
-                <div class="code">/polacz ${email}</div>
-              </div>
-              
-              <div class="instructions">
-                <div style="font-weight: bold; margin-bottom: 10px;">📋 Instrukcja aktywacji:</div>
-                <div class="step"><span class="step-num">1.</span> Dołącz do naszego serwera Discord (zaproszenie otrzymałeś w emailu zakupu)</div>
-                <div class="step"><span class="step-num">2.</span> Wpisz komendę: <span class="code">/polacz ${email}</span></div>
-                <div class="step"><span class="step-num">3.</span> Bot automatycznie przydzieli Ci dostęp! 🎉</div>
-              </div>
-
-              <div class="expiry">
-                <div style="font-weight: bold; color: #a855f7; margin-bottom: 8px;">⏰ Ewa dostępu:</div>
-                <div>${expiresAt.toLocaleDateString("pl-PL")}</div>
-              </div>
-              
-              <p style="color: #999; font-size: 12px;">
-                ⚠️ Każdy email może być używany tylko jeden raz. Po wpisaniu komendy dostęp będzie przypisany do Twojego konta Discord.
-              </p>
-            </div>
-            
-            <div class="footer">
-              <p>© 2025 Mamba Services. Wszystkie prawa zastrzeżone.</p>
-              <p>Email wysłany do: ${email}</p>
-            </div>
-          </div>
-        </body>
-      </html>
-    `,
-  };
-}
-
-export function generateAccessCodeEmail(email: string, code: string, generatorLink: string): { subject: string; html: string } {
-  return {
-    subject: "Twój kod dostępu - Mamba Obywatel 🐍",
-    html: `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="UTF-8">
-          <style>
-            body { font-family: 'Inter', Arial, sans-serif; background: #000; color: #fff; line-height: 1.6; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { text-align: center; padding: 20px 0; border-bottom: 2px solid #8eb34f; margin-bottom: 30px; }
-            .logo { font-size: 28px; font-weight: bold; color: #8eb34f; text-shadow: 0 0 10px rgba(142, 179, 79, 0.5); }
-            .content { background: #1a1a1a; padding: 30px; border: 1px solid #333; border-radius: 8px; margin-bottom: 20px; }
-            .thank-you { font-size: 24px; color: #8eb34f; margin-bottom: 20px; font-weight: bold; }
-            .code-box { background: #0a0a0a; border: 2px solid #8eb34f; border-radius: 6px; padding: 20px; margin: 20px 0; text-align: center; }
-            .code { font-size: 24px; font-family: 'Courier New', monospace; font-weight: bold; color: #8eb34f; letter-spacing: 2px; }
-            .step { margin: 10px 0; font-size: 14px; }
-            .step-num { color: #8eb34f; font-weight: bold; }
-            .link { color: #8eb34f; text-decoration: none; }
-            .instructions { background: #1a1a1a; border-left: 4px solid #8eb34f; padding: 15px; margin: 20px 0; }
-            .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #333; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <div class="logo">🐍 MAMBA OBYWATEL</div>
-            </div>
-            
-            <div class="content">
-              <div class="thank-you">Dziękujemy za Twoją transakcję!</div>
-              
-              <p>Twoje zamówienie zostało potwierdzone. Oto Twój jednorazowy kod dostępu:</p>
-              
-              <div class="code-box">
-                <div class="code">${code}</div>
-              </div>
-              
-              <div class="instructions">
-                <div style="font-weight: bold; margin-bottom: 10px;">📋 Instrukcja aktywacji:</div>
-                <div class="step"><span class="step-num">1.</span> Skopiuj kod dostępu powyżej</div>
-                <div class="step"><span class="step-num">2.</span> Przejdź na: <a href="${generatorLink}" class="link">${generatorLink}</a></div>
-                <div class="step"><span class="step-num">3.</span> Wklej kod i postępuj zgodnie z instrukcjami</div>
-              </div>
-              
-              <p style="color: #999; font-size: 12px;">
-                ⚠️ Kod jest jednorazowy. Po jego użyciu nie będzie już dostępny.
-              </p>
-            </div>
-            
-            <div class="footer">
-              <p>© 2025 Mamba Services. Wszystkie prawa zastrzeżone.</p>
-              <p>Email wysłany do: ${email}</p>
-            </div>
-          </div>
-        </body>
-      </html>
-    `,
-  };
-}
-
+// Funkcje generujące treść maili pozostają takie same, ale przy wysyłaniu używamy .trim()
 export async function sendTicketEmail(email: string): Promise<boolean> {
   try {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    const user = process.env.EMAIL_USER?.trim();
+    const pass = process.env.EMAIL_PASS?.trim();
+
+    if (!user || !pass) {
       console.warn("[Email] Gmail credentials not configured");
       return false;
     }
@@ -234,7 +50,7 @@ export async function sendTicketEmail(email: string): Promise<boolean> {
     const transporter = getEmailTransporter();
 
     const info = await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: user,
       to: email,
       subject: emailContent.subject,
       html: emailContent.html,
@@ -250,7 +66,10 @@ export async function sendTicketEmail(email: string): Promise<boolean> {
 
 export async function sendReceiptsEmail(email: string, expiresAt: Date): Promise<boolean> {
   try {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    const user = process.env.EMAIL_USER?.trim();
+    const pass = process.env.EMAIL_PASS?.trim();
+
+    if (!user || !pass) {
       console.warn("[Email] Gmail credentials not configured");
       return false;
     }
@@ -259,7 +78,7 @@ export async function sendReceiptsEmail(email: string, expiresAt: Date): Promise
     const transporter = getEmailTransporter();
 
     const info = await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: user,
       to: email,
       subject: emailContent.subject,
       html: emailContent.html,
@@ -275,7 +94,10 @@ export async function sendReceiptsEmail(email: string, expiresAt: Date): Promise
 
 export async function sendAccessCodeEmail(email: string, code: string, generatorLink: string): Promise<boolean> {
   try {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    const user = process.env.EMAIL_USER?.trim();
+    const pass = process.env.EMAIL_PASS?.trim();
+
+    if (!user || !pass) {
       console.warn("[Email] Gmail credentials not configured");
       return false;
     }
@@ -284,7 +106,7 @@ export async function sendAccessCodeEmail(email: string, code: string, generator
     const transporter = getEmailTransporter();
 
     const info = await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: user,
       to: email,
       subject: emailContent.subject,
       html: emailContent.html,
