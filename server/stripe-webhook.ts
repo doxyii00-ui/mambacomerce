@@ -31,35 +31,31 @@ const STRIPE_LINK_MAPPING: { [key: string]: { type: "obywatel" | "receipts"; tie
   "6oU28r2O8f6v3eI0C9cEw00": { type: "obywatel", tier: "premium" }, // test: obywatel 200 - ticket
 };
 
-export async function setupStripeWebhook(app: Express): Promise<void> {
-  // Webhook dla Stripe - sprawdza czy płatność przeszła
-  app.post("/api/webhooks/stripe", async (req, res) => {
-    console.log("🔔 [WEBHOOK] Stripe webhook received!");
-    console.log("🔔 [WEBHOOK] Headers:", req.headers);
-    console.log("🔔 [WEBHOOK] Body length:", (req.rawBody as Buffer)?.length || 0);
-    
+async function handleStripeWebhook(req: any, res: any) {
+  console.log("🔔 [WEBHOOK] Processing webhook...");
+  
+  try {
+    // Parse raw body as JSON
+    let event;
     try {
-      // Parse raw body as JSON
-      let event;
-      try {
-        const body = req.rawBody as Buffer;
-        if (!body) {
-          console.error("🔔 [WEBHOOK] No raw body!");
-          res.status(400).json({ error: "No body" });
-          return;
-        }
-        const bodyStr = body.toString("utf-8");
-        event = JSON.parse(bodyStr);
-        console.log("🔔 [WEBHOOK] Event parsed, type:", event.type);
-        console.log("🔔 [WEBHOOK] Event data:", JSON.stringify(event, null, 2).substring(0, 500));
-      } catch (error) {
-        console.error("🔔 [WEBHOOK] Failed to parse webhook body:", error);
-        res.status(400).json({ error: "Invalid JSON" });
+      const body = req.rawBody as Buffer;
+      if (!body) {
+        console.error("🔔 [WEBHOOK] No raw body!");
+        res.status(400).json({ error: "No body" });
         return;
       }
+      const bodyStr = body.toString("utf-8");
+      event = JSON.parse(bodyStr);
+      console.log("🔔 [WEBHOOK] Event parsed, type:", event.type);
+      console.log("🔔 [WEBHOOK] Event data:", JSON.stringify(event, null, 2).substring(0, 500));
+    } catch (error) {
+      console.error("🔔 [WEBHOOK] Failed to parse webhook body:", error);
+      res.status(400).json({ error: "Invalid JSON" });
+      return;
+    }
 
-      // Handle checkout.session.completed event
-      if (event.type === "checkout.session.completed") {
+    // Handle checkout.session.completed event
+    if (event.type === "checkout.session.completed") {
         const session = event.data.object;
         const sessionId = session.id;
         const email = session.customer_email;
@@ -143,10 +139,37 @@ export async function setupStripeWebhook(app: Express): Promise<void> {
         }
       }
 
-      res.status(200).json({ received: true });
-    } catch (error) {
-      console.error("[Stripe Webhook] Error:", error);
-      res.status(200).json({ received: true });
-    }
+    res.status(200).json({ received: true });
+  } catch (error) {
+    console.error("[Stripe Webhook] Error:", error);
+    res.status(200).json({ received: true });
+  }
+}
+
+export async function setupStripeWebhook(app: Express): Promise<void> {
+  // Test endpoint - manually trigger webhook for testing
+  app.post("/api/test/webhook", async (req, res) => {
+    console.log("🧪 [TEST] Manual webhook trigger");
+    const testEvent = {
+      type: "checkout.session.completed",
+      data: {
+        object: {
+          id: "cs_test_" + Date.now(),
+          customer_email: req.body.email || "test@example.com",
+          payment_link: req.body.linkId || "6oU28r2O8f6v3eI0C9cEw00", // test link
+        },
+      },
+    };
+    console.log("🧪 [TEST] Simulating event:", JSON.stringify(testEvent, null, 2));
+    req.rawBody = Buffer.from(JSON.stringify(testEvent));
+    return handleStripeWebhook(req, res);
+  });
+
+  // Webhook dla Stripe - sprawdza czy płatność przeszła
+  app.post("/api/webhooks/stripe", async (req, res) => {
+    console.log("🔔 [WEBHOOK] Stripe webhook received!");
+    console.log("🔔 [WEBHOOK] Headers:", req.headers);
+    console.log("🔔 [WEBHOOK] Body length:", (req.rawBody as Buffer)?.length || 0);
+    return handleStripeWebhook(req, res);
   });
 }
