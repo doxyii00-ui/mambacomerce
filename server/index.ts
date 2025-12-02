@@ -1,7 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
+import { createServer } from "http";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
-import { createServer } from "http";
 import { startDiscordBot } from "./discord-bot";
 import { storage } from "./storage";
 import { ALL_ACCESS_CODES } from "./access-codes";
@@ -35,11 +35,10 @@ export function log(message: string, source = "express") {
   console.log(`${formattedTime} [${source}] ${message}`);
 }
 
-// Logger tylko dla /api
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
+  let capturedJsonResponse: Record<string, any> | undefined;
 
   const originalResJson = res.json;
   res.json = function (bodyJson, ...args) {
@@ -59,21 +58,13 @@ app.use((req, res, next) => {
   next();
 });
 
-// --- TESTOWY ENDPOINT /ping ---
-app.get("/ping", (_req: Request, res: Response) => {
-  res.send("pong");
-});
-
-declare module "http" {
-  interface IncomingMessage {
-    rawBody: unknown;
-  }
-}
+// --- Test endpoint ---
+app.get("/ping", (_req: Request, res: Response) => res.send("pong"));
 
 // --- Database initialization ---
 async function initializeDatabase() {
   if (!process.env.DATABASE_URL) {
-    console.log("⚠️  DATABASE_URL not set");
+    console.log("⚠️ DATABASE_URL not set");
     return null;
   }
 
@@ -82,46 +73,7 @@ async function initializeDatabase() {
     const sqlConnection = postgres(process.env.DATABASE_URL);
     const db = drizzle(sqlConnection);
 
-    console.log("📝 Creating database tables...");
-    await sqlConnection`
-      CREATE TABLE IF NOT EXISTS users (
-        id varchar PRIMARY KEY,
-        email text NOT NULL UNIQUE,
-        password text NOT NULL
-      );
-    `;
-    await sqlConnection`
-      CREATE TABLE IF NOT EXISTS orders (
-        id varchar PRIMARY KEY,
-        email text NOT NULL,
-        product_id text NOT NULL,
-        product_name text NOT NULL,
-        price text NOT NULL,
-        stripe_session_id text UNIQUE,
-        status text NOT NULL DEFAULT 'pending',
-        created_at timestamp NOT NULL DEFAULT NOW()
-      );
-    `;
-    await sqlConnection`
-      CREATE TABLE IF NOT EXISTS discord_access (
-        id varchar PRIMARY KEY,
-        email text NOT NULL,
-        discord_user_id text NOT NULL,
-        expires_at timestamp NOT NULL,
-        created_at timestamp NOT NULL DEFAULT NOW()
-      );
-    `;
-    await sqlConnection`
-      CREATE TABLE IF NOT EXISTS obywatel_forms (
-        id varchar PRIMARY KEY,
-        email text NOT NULL,
-        order_id text NOT NULL,
-        form_data jsonb NOT NULL,
-        access_link text,
-        created_at timestamp NOT NULL DEFAULT NOW(),
-        submitted_at timestamp
-      );
-    `;
+    // --- Create tables if not exist ---
     await sqlConnection`
       CREATE TABLE IF NOT EXISTS access_codes (
         id varchar PRIMARY KEY,
@@ -134,8 +86,9 @@ async function initializeDatabase() {
         created_at timestamp NOT NULL DEFAULT NOW()
       );
     `;
-    console.log("✅ Database tables created");
+    console.log("✅ Database tables ready");
 
+    // Seed access codes if empty
     const existingCodes = await sqlConnection`SELECT COUNT(*) as count FROM access_codes`;
     const codeCount = parseInt(existingCodes[0]?.count as string || "0", 10);
 
@@ -143,19 +96,15 @@ async function initializeDatabase() {
       console.log(`🌱 Seeding ${ALL_ACCESS_CODES.length} access codes...`);
       for (let i = 0; i < ALL_ACCESS_CODES.length; i += 50) {
         const batch = ALL_ACCESS_CODES.slice(i, i + 50);
-        try {
-          await db.insert(accessCodes).values(
-            batch.map((code: string, idx: number) => ({
-              id: randomUUID(),
-              code,
-              productType: i + idx < 200 ? "obywatel" : "receipts",
-              isUsed: "false",
-            }))
-          ).onConflictDoNothing();
-          console.log(`✅ ${Math.min(i + 50, ALL_ACCESS_CODES.length)}/${ALL_ACCESS_CODES.length}`);
-        } catch (err) {
-          console.error(`Batch ${i}:`, err);
-        }
+        await db.insert(accessCodes).values(
+          batch.map((code: string, idx: number) => ({
+            id: randomUUID(),
+            code,
+            productType: i + idx < 200 ? "obywatel" : "receipts",
+            isUsed: "false",
+          }))
+        ).onConflictDoNothing();
+        console.log(`✅ ${Math.min(i + 50, ALL_ACCESS_CODES.length)}/${ALL_ACCESS_CODES.length}`);
       }
       console.log("✨ Seeding complete!");
     } else {
@@ -178,8 +127,7 @@ console.log("✅ Stripe webhook endpoints mounted:");
 console.log(" - POST /api/webhooks/stripe");
 console.log(" - POST /api/test/webhook");
 
-
-// --- Start app ---
+// --- Register other API routes ---
 (async () => {
   await initializeDatabase();
   await initializeAccessCodes();
@@ -191,7 +139,7 @@ console.log(" - POST /api/test/webhook");
     console.warn("Discord bot failed to start (optional):", error);
   }
 
-  // Error handler
+  // --- Error handler ---
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
@@ -199,7 +147,7 @@ console.log(" - POST /api/test/webhook");
     throw err;
   });
 
-  // Serve static in production / Vite in dev
+  // --- Serve frontend (React) AFTER /api ---
   if (process.env.NODE_ENV === "production") {
     serveStatic(app);
   } else {
@@ -207,6 +155,7 @@ console.log(" - POST /api/test/webhook");
     await setupVite(httpServer, app);
   }
 
+  // --- Start server ---
   const port = parseInt(process.env.PORT || "5000", 10);
   httpServer.listen({ port, host: "0.0.0.0", reusePort: true }, () => {
     log(`serving on port ${port}`);
