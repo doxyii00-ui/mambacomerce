@@ -15,8 +15,6 @@ import heroBg from "@assets/generated_images/dark_cyberpunk_digital_grid_hero_ba
 import obywatelVideo from "@assets/copy_E3111A92-34FD-401C-9AE1-8359E1F1F619_1764588726011.mov";
 import receiptsVideo from "@assets/3B567DDC-82D5-429F-B36F-3192BF8842C3_1764590038254.mov";
 
-const SELLAUTH_SHOP_ID = 91082;
-
 type ProductId = "obywatel-app" | "obywatel-pro" | "receipts-month" | "receipts-year" | "generator";
 
 export default function Home() {
@@ -37,7 +35,7 @@ export default function Home() {
       accentColor: "primary" as const,
       name: "MambaObywatel (App)",
       discordLink: "https://discord.gg/Ka5TQuWN6s",
-      sellAuthConfig: { productId: 543246, shopId: SELLAUTH_SHOP_ID }
+      checkoutLink: "https://mambaservice.mysellauth.com/product/mambaobywatelapka"
     },
     {
       id: "obywatel-pro" as ProductId,
@@ -48,7 +46,7 @@ export default function Home() {
       accentColor: "primary" as const,
       name: "MambaObywatel PRO",
       discordLink: "https://discord.gg/Ka5TQuWN6s",
-      sellAuthConfig: { productId: 543250, shopId: SELLAUTH_SHOP_ID }
+      checkoutLink: "https://mambaservice.mysellauth.com/product/mambagenerator"
     },
     {
       id: "receipts-month" as ProductId,
@@ -59,9 +57,8 @@ export default function Home() {
       features: t.products.receiptsMonth.features,
       accentColor: "secondary" as const,
       name: "MambaReceipts (Monthly)",
-      discordLink: "https://discord.gg/HxGrw2Rf99",
-      sellAuthConfig: { productId: 543372, shopId: SELLAUTH_SHOP_ID },
-      requiresDiscordBeforePurchase: true
+      discordLink: "https://discord.gg/W5VnefAuuz",
+      discordOnlyPurchase: true
     },
     {
       id: "receipts-year" as ProductId,
@@ -72,9 +69,8 @@ export default function Home() {
       features: t.products.receiptsYear.features,
       accentColor: "secondary" as const,
       name: "MambaReceipts (Annual)",
-      discordLink: "https://discord.gg/HxGrw2Rf99",
-      sellAuthConfig: { productId: 543373, shopId: SELLAUTH_SHOP_ID },
-      requiresDiscordBeforePurchase: true
+      discordLink: "https://discord.gg/W5VnefAuuz",
+      discordOnlyPurchase: true
     }
   ];
 
@@ -216,8 +212,8 @@ export default function Home() {
                   features={selectedProductData.features}
                   accentColor={selectedProductData.accentColor}
                   discordLink={selectedProductData.discordLink}
-                  sellAuthConfig={selectedProductData.sellAuthConfig}
-                  requiresDiscordBeforePurchase={(selectedProductData as any).requiresDiscordBeforePurchase}
+                  checkoutLink={(selectedProductData as any).checkoutLink}
+                  discordOnlyPurchase={(selectedProductData as any).discordOnlyPurchase}
                   onBuy={() => handleBuy({
                     name: selectedProductData.name,
                     price: selectedProductData.price,
