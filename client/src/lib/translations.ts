@@ -61,27 +61,26 @@ export const translations = {
         ]
       },
       receiptsMonth: {
-        title: "MambaReceipts",
-        price: "20 zł",
-        description: "Profesjonalny generator paragonów. Miesięczny plan subskrypcji.",
+        title: "MambaObywatel",
+        price: "100 zł",
+        description: "Pakiet 10 kodów do generatora Mamba Obywatel",
         features: [
-          "Niestandardowe dane handlowca",
-          "Prawidłowe sumy kontrolne",
-          "Wiele szablonów",
-          "Integracja bota Discord",
-          "Anuluj w dowolnym momencie"
+          "10 kodów aktywacyjnych",
+          "Natychmiastowa dostawa",
+          "Wsparcie Discord",
+          "Szybka aktywacja"
         ]
       },
       receiptsYear: {
         title: "MambaReceipts",
-        price: "60 zł",
-        description: "Roczny plan subskrypcji. Najlepsza wartość dla zwykłych użytkowników.",
+        price: "20zł/60zł",
+        description: "Dołącz na Discord po więcej szczegółów",
         features: [
           "Niestandardowe dane handlowca",
           "Prawidłowe sumy kontrolne",
           "Wiele szablonów",
           "Integracja bota Discord",
-          "Oszczędź 50% w porównaniu z miesięcznym"
+          "Dołącz na Discord po szczegóły"
         ]
       },
       buyButton: "KUP DOSTĘP"
@@ -205,27 +204,26 @@ export const translations = {
         ]
       },
       receiptsMonth: {
-        title: "MambaReceipts",
-        price: "$19.99",
-        description: "Professional receipt generation. Monthly subscription plan.",
+        title: "MambaObywatel",
+        price: "100 zł",
+        description: "Pack of 10 codes for Mamba Obywatel generator",
         features: [
-          "Custom Merchant Data",
-          "Valid Checksums",
-          "Multiple Templates",
-          "Discord Bot Integration",
-          "Cancel Anytime"
+          "10 activation codes",
+          "Instant delivery",
+          "Discord support",
+          "Quick activation"
         ]
       },
       receiptsYear: {
         title: "MambaReceipts",
-        price: "$49.99",
-        description: "Annual subscription plan. Best value for regular users.",
+        price: "20zł/60zł",
+        description: "Join Discord for more details",
         features: [
           "Custom Merchant Data",
           "Valid Checksums",
           "Multiple Templates",
           "Discord Bot Integration",
-          "Save 58% vs Monthly"
+          "Join Discord for details"
         ]
       },
       buyButton: "PURCHASE ACCESS"
