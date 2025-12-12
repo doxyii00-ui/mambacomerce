@@ -34,8 +34,8 @@ export default function Home() {
       features: t.products.obywatelApp.features,
       accentColor: "primary" as const,
       name: "fObywatel (App)",
-      discordLink: "https://discord.gg/Ka5TQuWN6s",
-      checkoutLink: "https://mambaservice.mysellauth.com/product/mambaobywatelapka"
+      discordLink: "https://discord.gg/zs8B5PWz",
+      checkoutLink: "https://mamba.sellhub.cx/product/MambaApka/"
     },
     {
       id: "obywatel-pro" as ProductId,
@@ -45,7 +45,7 @@ export default function Home() {
       features: t.products.obywatelPro.features,
       accentColor: "primary" as const,
       name: "fObywatel PRO",
-      discordLink: "https://discord.gg/Ka5TQuWN6s",
+      discordLink: "https://discord.gg/zs8B5PWz",
       checkoutLink: "https://mambaservice.mysellauth.com/product/mambagenerator"
     },
     {
@@ -56,7 +56,7 @@ export default function Home() {
       features: t.products.receiptsMonth.features,
       accentColor: "primary" as const,
       name: "fObywatel (10 Pack)",
-      discordLink: "https://discord.gg/Ka5TQuWN6s",
+      discordLink: "https://discord.gg/zs8B5PWz",
       checkoutLink: "https://mambaservice.mysellauth.com/product/mobywatelapka10"
     },
     {
@@ -68,7 +68,7 @@ export default function Home() {
       features: t.products.receiptsYear.features,
       accentColor: "secondary" as const,
       name: "Receipts",
-      discordLink: "https://discord.gg/W5VnefAuuz",
+      discordLink: "https://discord.gg/zs8B5PWz",
       discordOnlyPurchase: true
     }
   ];
